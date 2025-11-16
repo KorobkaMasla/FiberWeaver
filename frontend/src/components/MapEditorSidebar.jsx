@@ -333,7 +333,7 @@ function MapEditorSidebar({
                   <div key={obj.id} className={`object-item ${isActive ? 'active' : ''}`}>
                     <span className="object-type">{objectTypeEmojis[obj.object_type]}</span>
                     <div className="object-info">
-                      <strong>{obj.display_name || obj.name}</strong>
+                      <strong>{obj.name}</strong>
                       <small>{objectTypeNames[obj.object_type]}</small>
                     </div>
                     <div className="item-actions" style={{ marginLeft: 'auto', display: 'flex', gap: '6px' }}>
