@@ -96,6 +96,7 @@ def update_network_object(
     for key, value in obj_update.model_dump().items():
         setattr(obj, key, value)
     
+    obj.updated_at = datetime.utcnow()
     db.commit()
     db.refresh(obj)
     return obj

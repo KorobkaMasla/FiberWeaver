@@ -4,7 +4,7 @@ from jose import JWTError, jwt
 from typing import Optional, Dict, Any
 from .config import settings
 
-# Контекст для хеширования паролей (pbkdf2_sha256 стабилен на всех платформах)
+# Контекст для хеширования паролей 
 pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
 
 

@@ -18,7 +18,7 @@ class Cable(Base):
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
     updated_at = Column(DateTime, nullable=True)
 
-    # Relationships
+    # отношения
     cable_type = relationship("CableType", backref="cables")
     from_object = relationship("NetworkObject", foreign_keys=[from_object_id], backref="cables_from")
     to_object = relationship("NetworkObject", foreign_keys=[to_object_id], backref="cables_to")

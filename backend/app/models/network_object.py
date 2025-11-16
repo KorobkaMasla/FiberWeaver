@@ -17,6 +17,6 @@ class NetworkObject(Base):
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
     updated_at = Column(DateTime, nullable=True)
 
-    # Relationship to ObjectType
+    # Связь с типом объекта
     object_type_obj = relationship("ObjectType", backref="network_objects")
 

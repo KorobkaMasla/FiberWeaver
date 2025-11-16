@@ -46,7 +46,7 @@ MAX_DESCRIPTION_LENGTH = 1000
 MIN_FIBER_COUNT = 1
 MAX_FIBER_COUNT = 1000
 
-# Import/Export
+# Импорт/Экспорт
 MAX_FILE_SIZE_MB = 100
 SUPPORTED_IMPORT_FORMATS = ["json", "geojson"]
 SUPPORTED_EXPORT_FORMATS = ["json", "geojson", "csv"]

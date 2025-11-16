@@ -97,7 +97,7 @@ export const createMarkerIcon = (emoji, highlight = false) => {
 };
 
 /**
- * Get cable color by type
+ * Get cable color by type and fiber count
  */
 export const getCableColor = (cableTypeName, fiberCount, dbColor) => {
   // Priority 1: Use color from DB if available
@@ -106,7 +106,17 @@ export const getCableColor = (cableTypeName, fiberCount, dbColor) => {
     return dbColor.startsWith('#') ? dbColor : `#${dbColor}`;
   }
   
-  // Priority 2: Unknown cable type - return blue
+  // Priority 2: For optical cables with fiber_count, use specific color
+  if (cableTypeName === 'optical' && fiberCount && fiberCountColors[fiberCount]) {
+    return fiberCountColors[fiberCount];
+  }
+  
+  // Priority 3: Use generic cable type color
+  if (cableTypeColors[cableTypeName]) {
+    return cableTypeColors[cableTypeName];
+  }
+  
+  // Priority 4: Fallback to blue
   return '#3b82f6';
 };
 

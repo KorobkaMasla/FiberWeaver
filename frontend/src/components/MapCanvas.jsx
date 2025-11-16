@@ -100,9 +100,9 @@ function MapCanvas(props) {
         if (!fromObj || !toObj) return null;
         return (
           <Polyline
-            key={`cable-${cable.id}`}
+            key={`cable-${cable.id}-${cable.cable_type_id}`}
             positions={[[fromObj.latitude, fromObj.longitude], [toObj.latitude, toObj.longitude]]}
-            color={getCableColor(cable.cable_type, cable.fiber_count)}
+            color={cable.cable_type_color || '#3b82f6'}
             weight={3}
             opacity={0.8}
             dashArray={cable.cable_type === 'optical' ? '' : '5, 5'}

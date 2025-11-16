@@ -203,6 +203,7 @@ def update_cable(
     for key, value in data.items():
         setattr(cable, key, value)
     
+    cable.updated_at = datetime.utcnow()
     db.commit()
     db.refresh(cable)
     return _cable_to_response(cable)

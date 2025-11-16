@@ -459,7 +459,8 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
     try {
       const response = await authService.authenticatedFetch('http://localhost:8000/api/cables/');
       const data = await response.json();
-      setCables(data);
+      // Create new array reference to ensure React detects the change
+      setCables([...data]);
     } catch (error) {
       console.error('Error fetching cables:', error);
     }
@@ -1072,7 +1073,8 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
         fiber_count: '',
         distance_km: ''
       });
-      fetchCables();
+      // Полная перезагрузка кабелей
+      await fetchCables();
     } catch (error) {
       console.error('Error updating cable:', error);
       setToast({ message: 'Ошибка обновления кабеля', type: 'error' });
@@ -1213,7 +1215,7 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
             const toObj = filteredObjects.find(o => o.id === cable.to_object_id);
             return (
               <Polyline 
-                key={`cable-${cable.id}`}
+                key={`cable-${cable.id}-${cable.cable_type_id}`}
                 positions={[[fromObj.latitude, fromObj.longitude], [toObj.latitude, toObj.longitude]]}
                 color={cable.cable_type_color || '#3b82f6'}
                 weight={3}
