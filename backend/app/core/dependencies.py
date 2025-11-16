@@ -34,7 +34,6 @@ async def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
     
-    # Преобразуем строку в integer
     try:
         user_id = int(user_id_str)
     except (ValueError, TypeError):
@@ -74,7 +73,6 @@ def check_permission(permission_name: str):
         current_user: User = Depends(get_current_user),
         db: Session = Depends(get_db)
     ):
-        # Получаем роли пользователя
         user_with_roles = db.query(User).filter(User.user_id == current_user.user_id).options(
             db.joinedload(User.roles).joinedload(Role.permissions)
         ).first()
@@ -85,7 +83,6 @@ def check_permission(permission_name: str):
                 detail="User not found"
             )
         
-        # Проверяем есть ли нужное право в ролях пользователя
         has_permission = False
         for role in user_with_roles.roles:
             for permission in role.permissions:

@@ -82,7 +82,6 @@ def export_geojson(db: Session = Depends(get_db)):
     
     features = []
     
-    # Add objects as points
     for obj in objects:
         features.append({
             "type": "Feature",
@@ -98,7 +97,6 @@ def export_geojson(db: Session = Depends(get_db)):
             }
         })
     
-    # Add cables as line strings
     for cable in cables:
         from_obj = next((o for o in objects if o.network_object_id == cable.from_object_id), None)
         to_obj = next((o for o in objects if o.network_object_id == cable.to_object_id), None)

@@ -1,34 +1,26 @@
-// Frontend Constants
 
 export const API_BASE_URL = 'http://localhost:8000';
 export const API_PREFIX = '/api';
 export const API_ENDPOINTS = {
-  // Auth
   AUTH_LOGIN: `${API_PREFIX}/auth/login`,
   AUTH_REGISTER: `${API_PREFIX}/auth/register`,
   
-  // Network Objects
   NETWORK_OBJECTS: `${API_PREFIX}/network-objects`,
   NETWORK_OBJECTS_LIST: `${API_PREFIX}/network-objects/`,
   
-  // Cables
   CABLES: `${API_PREFIX}/cables`,
   CABLES_LIST: `${API_PREFIX}/cables/`,
   
-  // Fiber Splices
   FIBER_SPLICES: `${API_PREFIX}/fiber-splices`,
   FIBER_SPLICES_LIST: `${API_PREFIX}/fiber-splices/`,
   
-  // Export
   EXPORT_FULL: `${API_PREFIX}/export/full`,
   EXPORT_GEOJSON: `${API_PREFIX}/export/geojson`,
   
-  // Import
   IMPORT_SCHEMA: `${API_PREFIX}/import/schema`,
   IMPORT_GEOJSON: `${API_PREFIX}/import/geojson`,
 };
 
-// Cable Types
 export const CABLE_TYPES = {
   OPTICAL: 'optical',
   COPPER: 'copper',
@@ -44,7 +36,6 @@ export const CABLE_TYPE_COLORS = {
   copper: '#004E89',
 };
 
-// Object Types
 export const OBJECT_TYPES = {
   NODE: 'node',
   MUFA: 'mufa',
@@ -81,13 +72,11 @@ export const OBJECT_TYPE_ICONS = {
   wifi: '📡',
 };
 
-// Map
-export const MAP_CENTER = [49.2, 28.5]; // Kyiv, Ukraine
+export const MAP_CENTER = [49.2, 28.5]; 
 export const MAP_ZOOM = 10;
 export const MAP_MIN_ZOOM = 2;
 export const MAP_MAX_ZOOM = 19;
 
-// Toast
 export const TOAST_DURATION = 3000;
 export const TOAST_TYPES = {
   SUCCESS: 'success',
@@ -96,14 +85,12 @@ export const TOAST_TYPES = {
   WARNING: 'warning',
 };
 
-// Form
 export const MIN_NAME_LENGTH = 1;
 export const MAX_NAME_LENGTH = 255;
 export const MAX_DESCRIPTION_LENGTH = 1000;
 export const MIN_FIBER_COUNT = 1;
 export const MAX_FIBER_COUNT = 1000;
 
-// Validation
 export const VALIDATION_RULES = {
   NAME: {
     required: true,
@@ -118,7 +105,6 @@ export const VALIDATION_RULES = {
   },
 };
 
-// Storage Keys
 export const STORAGE_KEYS = {
   ACCESS_TOKEN: 'access_token',
   REFRESH_TOKEN: 'refresh_token',
@@ -126,7 +112,6 @@ export const STORAGE_KEYS = {
   USER_INFO: 'user_info',
 };
 
-// Keyboard Shortcuts
 export const KEYBOARD_SHORTCUTS = {
   M: 'Toggle Measurement Mode',
   S: 'Toggle Select Mode',

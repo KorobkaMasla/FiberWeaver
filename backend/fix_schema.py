@@ -27,7 +27,6 @@ try:
     """)
     print(f"  Updated {cursor.rowcount} rows")
     
-    # For any remaining NULLs (objects with no matching type), set to default 'node' (usually ID 1)
     cursor.execute("""
         UPDATE network_objects
         SET object_type_id = 1
@@ -37,7 +36,6 @@ try:
     
     print("\nStep 2: Recreating table without object_type column...")
     
-    # Create new table without object_type
     cursor.execute("""
         CREATE TABLE network_objects_new (
             network_object_id INTEGER PRIMARY KEY,
@@ -53,7 +51,6 @@ try:
         )
     """)
     
-    # Copy data from old table
     cursor.execute("""
         INSERT INTO network_objects_new 
         SELECT network_object_id, name, object_type_id, latitude, longitude, 
@@ -62,13 +59,10 @@ try:
     """)
     print(f"  Copied {cursor.rowcount} rows to new table")
     
-    # Drop old table
     cursor.execute("DROP TABLE network_objects")
     
-    # Rename new table
     cursor.execute("ALTER TABLE network_objects_new RENAME TO network_objects")
     
-    # Recreate indexes if any existed
     cursor.execute("""
         CREATE INDEX idx_network_objects_object_type_id 
         ON network_objects(object_type_id)
@@ -77,7 +71,6 @@ try:
     conn.commit()
     print("✅ Schema migration successful!")
     
-    # Verify
     print("\nVerifying new schema...")
     cursor.execute("PRAGMA table_info(network_objects)")
     for col in cursor.fetchall():

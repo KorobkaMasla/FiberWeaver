@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+
 """Add address column to existing network_objects table"""
 
 import sqlite3
@@ -18,7 +18,6 @@ def add_address_column():
         conn = sqlite3.connect(str(db_path))
         cursor = conn.cursor()
         
-        # Check if column already exists
         cursor.execute("PRAGMA table_info(network_objects)")
         columns = [row[1] for row in cursor.fetchall()]
         
@@ -27,11 +26,9 @@ def add_address_column():
             conn.close()
             return True
         
-        # Add address column
         print("Adding address column to network_objects table...")
         cursor.execute("ALTER TABLE network_objects ADD COLUMN address TEXT")
         
-        # Create index on address column for search optimization
         cursor.execute("""
             CREATE INDEX IF NOT EXISTS ix_network_objects_address 
             ON network_objects (address)

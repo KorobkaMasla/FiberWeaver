@@ -28,7 +28,6 @@ function FilterPanel({
 
       {showFilters && (
         <div className="filter-dropdown">
-          {/* Object Types Section */}
           <div className="filter-section">
             <div className="filter-section-title">Типы объектов</div>
             <div className="filter-options">
@@ -45,7 +44,6 @@ function FilterPanel({
             </div>
           </div>
 
-          {/* Cable Types Section */}
           <div className="filter-section">
             <div className="filter-section-title">Типы кабелей</div>
             <div className="filter-options">

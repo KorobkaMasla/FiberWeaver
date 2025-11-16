@@ -16,7 +16,7 @@ function MapEditorSidebar({
   isResizing,
   setIsResizing,
   isMobile,
-  // Objects tab content
+  // Содержимое вкладки «Объекты»
   objectsForm,
   onObjectsFormChange,
   onObjectSubmit,
@@ -33,7 +33,7 @@ function MapEditorSidebar({
   objectsQuickFilters,
   setObjectsQuickFilters,
   addressLoading,
-  // Cables tab content
+  // Содержимое вкладки «Кабели»
   cablesForm,
   onCablesFormChange,
   onCablesSubmit,
@@ -47,15 +47,14 @@ function MapEditorSidebar({
   setCablesSearchTerm,
   cablesQuickFilters,
   setCablesQuickFilters,
-  // UI data
+  // UI данные
   objectTypes = [],
   cableTypes = [],
   objectTypeEmojis,
   objectTypeNames,
   getCableColor,
-  objects // для заполнения селектов в кабелях
+  objects 
 }) {
-  // Логика управления высотой формы через resizer
   useEffect(() => {
     const handleMouseMove = (e) => {
       if (!isResizing) return;
@@ -81,11 +80,11 @@ function MapEditorSidebar({
       // Минимальный резерв для списка (заголовок + несколько строк + прокрутка)
       const minListReserve = 140;
 
-      // Желаемая высота формы от нижней границы табов до текущей позиции курсора
+      // Высота формы от нижней границы табов до текущей позиции курсора
       const rawHeight = e.clientY - tabsBottom;
       const clampedHeight = Math.max(minFormHeight, rawHeight);
 
-      // Максимально возможная высота формы с учётом резерва и ресайзера
+      // Максимально высота формы с учётом резерва и ресайзера
       const maxFormHeight = sidebarHeight - tabsHeight - resizerHeight - minListReserve;
 
       const finalHeight = Math.min(clampedHeight, maxFormHeight);
@@ -136,7 +135,7 @@ function MapEditorSidebar({
 
   return (
     <aside className={`sidebar ${!isMobile || sidebarVisible ? 'visible' : ''}`}>
-      {/* Close button for mobile/tablet */}
+      {/* Кнопка закрытия для телефона */}
       <button
         type="button"
         className="sidebar-close-btn"
@@ -147,7 +146,7 @@ function MapEditorSidebar({
         ✕
       </button>
       
-      {/* Tabs */}
+      {/* Вкладки */}
       <div className="sidebar-tabs">
         <button 
           className={`sidebar-tab ${activeTab === 'objects' ? 'active' : ''}`}
@@ -163,10 +162,10 @@ function MapEditorSidebar({
         </button>
       </div>
 
-      {/* Objects Tab */}
+      {/* Вкладка «Объекты» */}
       {activeTab === 'objects' && (
         <>
-          {/* Form Section */}
+          {/* Раздел формы */}
           <div className="sidebar-form-section" style={{ height: `${formHeight}px` }}>
             <div className="sidebar-header">
               <h3>{isEditingObject ? 'Редактировать объект' : 'Новый объект'}</h3>
@@ -284,7 +283,7 @@ function MapEditorSidebar({
             </form>
           </div>
 
-          {/* Resizer */}
+          {/* Изменение размера */}
           <div 
             className="sidebar-resizer"
             onMouseDown={() => setIsResizing(true)}
@@ -313,13 +312,13 @@ function MapEditorSidebar({
             <div className="objects-scroll">
               {objectsList
                 .filter(obj => {
-                  // Search filter - search by name, type, and address
+                  // Фильтр поиска — поиск по имени, типу и адресу.
                   const matchesSearch = 
                     obj.name.toLowerCase().includes(objectsSearchTerm.toLowerCase()) ||
                     objectTypeNames[obj.object_type]?.toLowerCase().includes(objectsSearchTerm.toLowerCase()) ||
                     (obj.address && obj.address.toLowerCase().includes(objectsSearchTerm.toLowerCase()));
                   
-                  // Quick filter - if no quick filters selected, show all; otherwise only show selected types
+                  // Быстрый фильтр — если быстрые фильтры не выбраны, показывает все
                   const matchesQuickFilter = objectsQuickFilters.size === 0 || objectsQuickFilters.has(obj.object_type);
                   
                   return matchesSearch && matchesQuickFilter;
@@ -362,10 +361,10 @@ function MapEditorSidebar({
         </>
       )}
 
-      {/* Cables Tab */}
+      {/* Вкладка «Кабели» */}
       {activeTab === 'cables' && (
         <>
-          {/* Form Section */}
+          {/* Раздел формы */}
           <div className="sidebar-form-section" style={{ height: `${formHeight}px` }}>
             <div className="sidebar-header">
               <h3>{isEditingCable ? 'Редактировать кабель' : 'Новый кабель'}</h3>
@@ -485,13 +484,13 @@ function MapEditorSidebar({
             </form>
           </div>
 
-          {/* Resizer */}
+          {/* Изменение размера */}
           <div 
             className="sidebar-resizer"
             onMouseDown={() => setIsResizing(true)}
           />
 
-          {/* Cables List */}
+          {/* Список кабелей */}
           <div className="cables-list">
             <h3>Кабели ({cablesList.length})</h3>
             <div className="search-filter-row">
@@ -516,7 +515,7 @@ function MapEditorSidebar({
                   const toObj = objects.find(o => o.id === cable.to_object_id);
                   const searchLower = cablesSearchTerm.toLowerCase();
                   
-                  // Search filter
+                  // Фильтр поиска
                   const matchesSearch = (
                     cable.name.toLowerCase().includes(searchLower) ||
                     fromObj?.name.toLowerCase().includes(searchLower) ||
@@ -524,7 +523,7 @@ function MapEditorSidebar({
                     (cable.cable_type_name || '').toLowerCase().includes(searchLower)
                   );
                   
-                  // Quick filter - if no quick filters selected, show all; otherwise only show selected types
+                  // Быстрый фильтр — если быстрые фильтры не выбраны, показывает все
                   const matchesQuickFilter = cablesQuickFilters.size === 0 || cablesQuickFilters.has(cable.cable_type_name);
                   
                   return matchesSearch && matchesQuickFilter;
@@ -545,7 +544,7 @@ function MapEditorSidebar({
                     <div className="cable-type-badge">
                       <span className="cable-tiny">{cable.cable_type_name || 'Синий'}{cable.fiber_count ? ` • ${cable.fiber_count}` : ''}</span>
                     </div>
-                    <div className="item-actions" style={{ marginLeft: 'auto', display: 'flex', gap: '6px' }}>
+                    <div className="item-actions" style={{ display: 'flex', gap: '6px' }}>
                       <button
                         onClick={() => onEditCable(cable)}
                         className="btn-icon"

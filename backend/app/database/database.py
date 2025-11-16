@@ -4,7 +4,6 @@ import os
 
 # используется файл бд в каталоге проекта
 db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../test.db'))
-# проверка и создание каталога базы данных, если он не существует
 os.makedirs(os.path.dirname(db_path), exist_ok=True)
 SQLALCHEMY_DATABASE_URL = f"sqlite:///{db_path}"
 

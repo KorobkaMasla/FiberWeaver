@@ -1,47 +1,38 @@
-// API service with authentication
 const API_BASE_URL = 'http://localhost:8000/api';
 
 class AuthService {
-  // Сохранение токенов в localStorage
   setTokens(accessToken, refreshToken) {
     localStorage.setItem('access_token', accessToken);
     localStorage.setItem('refresh_token', refreshToken);
   }
 
-  // Получение access token
   getAccessToken() {
     return localStorage.getItem('access_token');
   }
 
-  // Получение refresh token
   getRefreshToken() {
     return localStorage.getItem('refresh_token');
   }
 
-  // Очистка токенов (при логауте)
   clearTokens() {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
     localStorage.removeItem('user');
   }
 
-  // Сохранение информации о пользователе
   setUser(user) {
     localStorage.setItem('user', JSON.stringify(user));
   }
 
-  // Получение информации о пользователе
   getUser() {
     const user = localStorage.getItem('user');
     return user ? JSON.parse(user) : null;
   }
 
-  // Проверка, авторизован ли пользователь
   isAuthenticated() {
     return !!this.getAccessToken();
   }
 
-  // Регистрация
   async register(login, email, password) {
     const response = await fetch(`${API_BASE_URL}/auth/register`, {
       method: 'POST',
@@ -60,7 +51,6 @@ class AuthService {
     return data;
   }
 
-  // Логин
   async login(login, password) {
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
@@ -80,7 +70,6 @@ class AuthService {
   }
 
 
-  // Обновление access token
   async refreshAccessToken() {
     const refreshToken = this.getRefreshToken();
     if (!refreshToken) {
@@ -104,12 +93,10 @@ class AuthService {
     return data;
   }
 
-  // Логаут
   logout() {
     this.clearTokens();
   }
 
-  // Получить информацию о текущем пользователе
   async getCurrentUser() {
     const response = await this.authenticatedFetch(`${API_BASE_URL}/auth/me`);
     if (!response.ok) {
@@ -120,7 +107,6 @@ class AuthService {
     return user;
   }
 
-  // Вспомогательный метод для API запросов с авторизацией
   async authenticatedFetch(url, options = {}) {
     const accessToken = this.getAccessToken();
 
@@ -136,7 +122,6 @@ class AuthService {
 
     let response = await fetch(url, { ...options, headers });
 
-    // Если получили 401, пытаемся обновить токен
     if (response.status === 401) {
       try {
         await this.refreshAccessToken();

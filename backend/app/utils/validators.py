@@ -43,7 +43,7 @@ def validate_fiber_count(count: int) -> bool:
 def validate_distance(distance: float) -> bool:
     """Проверка длины кабеля"""
     if distance is None:
-        return True  # Опциональное поле
+        return True  
     try:
         dist = float(distance)
         return dist >= 0
@@ -87,7 +87,7 @@ def serialize_object_to_dict(obj) -> Dict[str, Any]:
     for column in obj.__table__.columns:
         value = getattr(obj, column.name)
         
-        # Обработка datetime
+        # обработка datetime
         if hasattr(value, 'isoformat'):
             result[column.name] = value.isoformat()
         else:

@@ -27,7 +27,6 @@ def create_network_object(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    # Проверка на существование объекта с таким именем
     existing = db.query(NetworkObject).filter(
         NetworkObject.name == obj.name
     ).first()
@@ -40,14 +39,13 @@ def create_network_object(
     db.commit()
     db.refresh(db_obj)
     
-    # Пытаемся определить регион по адресу и добавить объект туда
+    
     if db_obj.address:
-        try:
-            # Ищем регион, название которого содержится в адресе объекта
+        try:            
             regions = db.query(Region).all()
             for region in regions:
                 if region.name.lower() in db_obj.address.lower():
-                    # Используем raw SQL для добавления в junction table
+                    
                     from sqlalchemy import text
                     db.execute(text(
                         f"INSERT OR IGNORE INTO region_objects (region_id, network_object_id) "
@@ -60,9 +58,8 @@ def create_network_object(
         except Exception as e:
             print(f"Error adding object to region: {e}")
             db.rollback()
-            # Продолжаем работу даже если произойдёт ошибка
-    
-    # Reload with relationship eager-loaded
+            
+       
     db_obj = db.query(NetworkObject).options(selectinload(NetworkObject.object_type_obj)).filter(
         NetworkObject.network_object_id == db_obj.network_object_id
     ).first()

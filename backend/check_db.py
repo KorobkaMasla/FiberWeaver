@@ -3,14 +3,12 @@ import sqlite3
 conn = sqlite3.connect('test.db')
 cursor = conn.cursor()
 
-# Check tables
 cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
 tables = cursor.fetchall()
 print('Tables in DB:')
 for table in tables:
     print(f'  - {table[0]}')
 
-# Check counts
 cursor.execute("SELECT COUNT(*) FROM network_objects")
 obj_count = cursor.fetchone()[0]
 print(f'\nNetwork objects count: {obj_count}')
@@ -23,7 +21,6 @@ cursor.execute("SELECT COUNT(*) FROM cable_types")
 type_count = cursor.fetchone()[0]
 print(f'Cable types count: {type_count}')
 
-# Show some data
 print('\nFirst 5 network objects:')
 cursor.execute("SELECT id, name, object_type FROM network_objects LIMIT 5")
 for row in cursor.fetchall():

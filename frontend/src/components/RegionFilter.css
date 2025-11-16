@@ -280,7 +280,7 @@
   cursor: not-allowed;
 }
 
-/* Scrollbar styling */
+/* Стиль полосы прокрутки */
 .region-suggestions::-webkit-scrollbar,
 .region-selected-list::-webkit-scrollbar {
   width: 5px;
@@ -300,4 +300,69 @@
 .region-suggestions::-webkit-scrollbar-thumb:hover,
 .region-selected-list::-webkit-scrollbar-thumb:hover {
   background: var(--bg-hover);
+}
+
+/* Мобильная адаптация */
+@media (max-width: 768px) {
+  .region-filter-menu {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    transform: none;
+    width: 100%;
+    max-width: 100%;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    max-height: 70vh;
+    margin-top: 0;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .region-filter-dropdown {
+    position: static;
+  }
+
+  .region-label {
+    max-width: 80px;
+  }
+
+  .region-filter-toggle {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+
+  .region-list-container {
+    min-height: 120px;
+  }
+}
+
+@media (max-width: 480px) {
+  .region-label {
+    max-width: 60px;
+  }
+
+  .region-filter-toggle {
+    font-size: 11px;
+    padding: 5px 8px;
+    gap: 6px;
+  }
+
+  .region-filter-menu {
+    max-height: 75vh;
+  }
+
+  .region-search-input {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+
+  .region-search-container {
+    padding: 10px;
+  }
+
+  .pick-from-map-btn {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
 }

@@ -1,9 +1,7 @@
-// Custom hooks for data management
-
 import { useState, useCallback, useEffect } from 'react';
 import apiClient from '../utils/apiClient.js';
 
-// Hook для загрузки сетевых объектов
+// Хук для загрузки сетевых объектов
 export const useNetworkObjects = () => {
   const [objects, setObjects] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -54,7 +52,7 @@ export const useNetworkObjects = () => {
   return { objects, loading, error, fetch, create, update, remove };
 };
 
-// Hook для загрузки кабелей
+// Хук для загрузки кабелей
 export const useCables = () => {
   const [cables, setCables] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -105,7 +103,7 @@ export const useCables = () => {
   return { cables, loading, error, fetch, create, update, remove };
 };
 
-// Hook для загрузки fiber splices
+// Хук для загрузки fiber splices
 export const useFiberSplices = (cableId) => {
   const [splices, setSplices] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -157,7 +155,7 @@ export const useFiberSplices = (cableId) => {
   return { splices, loading, error, fetch, create, update, remove };
 };
 
-// Hook для управления loading состоянием
+// Хук для управления loading состоянием
 export const useAsync = (asyncFunction, immediate = true) => {
   const [status, setStatus] = useState('idle');
   const [data, setData] = useState(null);
@@ -188,7 +186,7 @@ export const useAsync = (asyncFunction, immediate = true) => {
   return { execute, status, data, error };
 };
 
-// Hook для управления boolean состоянием
+// Хук для управления boolean состоянием
 export const useToggle = (initialValue = false) => {
   const [value, setValue] = useState(initialValue);
 
@@ -207,7 +205,7 @@ export const useToggle = (initialValue = false) => {
   return { value, toggle, setTrue, setFalse };
 };
 
-// Hook для управления form state
+// Хук для управления form state
 export const useForm = (initialValues, onSubmit) => {
   const [values, setValues] = useState(initialValues);
   const [errors, setErrors] = useState({});

@@ -7,10 +7,9 @@ function ToolsNotification({ message, duration = 3000 }) {
   const [isMounted, setIsMounted] = useState(false);  // Отслеживаем монтирование
 
   useEffect(() => {
-    // Запустить анимацию открытия при монтировании
     const mountTimer = setTimeout(() => {
       setIsMounted(true);
-    }, 10);  // Небольшая задержка, чтобы браузер заметил изменение состояния
+    }, 10); 
 
     return () => clearTimeout(mountTimer);
   }, []);

@@ -1,9 +1,6 @@
 import React from 'react';
-import './MapEditor.css'; // Uses existing modal styles
+import './MapEditor.css'; 
 
-/**
- * ConfirmDialog - переиспользуемое модальное окно подтверждения
- */
 function ConfirmDialog({ isOpen, title, message, onConfirm, onCancel, confirmText = '✓ Удалить', cancelText = '✕ Отмена' }) {
   if (!isOpen) return null;
 

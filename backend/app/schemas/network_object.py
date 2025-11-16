@@ -13,7 +13,6 @@ class NetworkObjectCreate(BaseModel):
 
 
 class NetworkObjectResponse(BaseModel):
-    # Map SQLAlchemy attribute network_object_id -> id for frontend
     id: int = Field(validation_alias='network_object_id')
     name: str
     object_type_id: int
@@ -24,10 +23,8 @@ class NetworkObjectResponse(BaseModel):
     created_at: datetime
     updated_at: Optional[datetime] = None
     
-    # Store the relationship object for computed fields
     object_type_obj: Optional[object] = Field(default=None, exclude=True)
     
-    # Computed fields derived from object_type_obj
     object_type: str = 'unknown'
     display_name: Optional[str] = None
 
@@ -35,10 +32,8 @@ class NetworkObjectResponse(BaseModel):
     def populate_computed_fields(self):
         """Populate computed fields from object_type_obj relationship"""
         if self.object_type_obj:
-            # Get the name from the relationship object
             if hasattr(self.object_type_obj, 'name'):
                 self.object_type = self.object_type_obj.name
-            # Get the display_name from the relationship object
             if hasattr(self.object_type_obj, 'display_name'):
                 self.display_name = self.object_type_obj.display_name
         return self

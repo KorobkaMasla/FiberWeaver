@@ -13,25 +13,20 @@ function DrawingMode({ mapRef, isActive, onClose, drawnItems, setDrawnItems }) {
     shape: null,
     previewShape: null,
   });
-  // Актуальный список фигур в ref, чтобы обработчики Leaflet видели свежие данные
+  // Актуальный список фигур
   const drawnItemsRef = useRef(drawnItems);
   const spacePressedRef = useRef(false);
-  // Храним активную функцию очистки текущего инструмента
   const activeCleanupRef = useRef(null);
 
-  // Очистить инструменты при деактивации режима
   useEffect(() => {
     if (!isActive) {
       finishTool({ enableDrag: true, resetTool: true });
     }
   }, [isActive]);
 
-  // Гарантированная очистка при размонтировании компонента (когда родитель скрывает сразу)
   useEffect(() => {
     return () => {
-      // Если инструмент активен или слушатели ещё висят, выполнить очистку
       finishTool({ enableDrag: true, resetTool: true });
-      // Сбросить выбранный инструмент явно
       setCurrentTool(null);
     };
   }, []);
@@ -47,7 +42,6 @@ function DrawingMode({ mapRef, isActive, onClose, drawnItems, setDrawnItems }) {
   // Обработка зажима Space для панорамирования карты
   useEffect(() => {
     const handleKeyDown = (e) => {
-      // Не перехватываем пробел если фокус на input/textarea (например при поиске)
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
         return;
       }
@@ -58,7 +52,7 @@ function DrawingMode({ mapRef, isActive, onClose, drawnItems, setDrawnItems }) {
         if (mapRef) {
           mapRef.dragging.enable();
         }
-        // Прервать текущий набросок, чтобы не рисовалось при панорамировании
+        // Прервать текущий набросок чтобы не рисовалось при панорамировании
         if (drawingRef.current.startPoint || drawingRef.current.previewShape) {
           if (drawingRef.current.previewShape && mapRef) {
             mapRef.removeLayer(drawingRef.current.previewShape);
@@ -154,7 +148,7 @@ function DrawingMode({ mapRef, isActive, onClose, drawnItems, setDrawnItems }) {
 
       points.push([lat, lng]);
 
-      // Маркер-вершина для удобного клика (увеличенная область)
+      // Маркер-вершина для удобного клика
       const marker = L.circleMarker([lat, lng], {
         radius: 6,
         color: '#4a9eff',
@@ -207,9 +201,15 @@ function DrawingMode({ mapRef, isActive, onClose, drawnItems, setDrawnItems }) {
   // Рисование линии через Drag & Drop
   const startLine = () => {
     if (!mapRef) return;
-    finishTool({ enableDrag: false }); // Завершить предыдущий инструмент
+    finishTool({ enableDrag: false }); 
     setCurrentTool('line');
     mapRef.dragging.disable();
+
+    const getTouchCoords = (touch) => {
+      const containerPoint = L.point(touch.clientX, touch.clientY);
+      const layerPoint = mapRef.containerPointToLayerPoint(containerPoint);
+      return mapRef.layerPointToLatLng(layerPoint);
+    };
 
     const handleMouseDown = (e) => {
       if (spacePressed) return;
@@ -217,10 +217,34 @@ function DrawingMode({ mapRef, isActive, onClose, drawnItems, setDrawnItems }) {
       drawingRef.current.startPoint = mapRef.mouseEventToLatLng(e.originalEvent);
     };
 
+    const handleTouchStart = (e) => {
+      if (spacePressed || e.touches.length !== 1) return;
+      e.preventDefault();
+      setIsDrawing(true);
+      drawingRef.current.startPoint = getTouchCoords(e.touches[0]);
+    };
+
     const handleMouseMove = (e) => {
       if (!drawingRef.current.startPoint || spacePressed) return;
 
       const endPoint = mapRef.mouseEventToLatLng(e.originalEvent);
+
+      if (drawingRef.current.previewShape) {
+        mapRef.removeLayer(drawingRef.current.previewShape);
+      }
+
+      drawingRef.current.previewShape = L.polyline([drawingRef.current.startPoint, endPoint], {
+        color: '#ff9d4a',
+        weight: 3,
+        dashArray: '5, 5',
+      }).addTo(mapRef);
+    };
+
+    const handleTouchMove = (e) => {
+      if (!drawingRef.current.startPoint || spacePressed || e.touches.length !== 1) return;
+      e.preventDefault();
+
+      const endPoint = getTouchCoords(e.touches[0]);
 
       if (drawingRef.current.previewShape) {
         mapRef.removeLayer(drawingRef.current.previewShape);
@@ -242,7 +266,7 @@ function DrawingMode({ mapRef, isActive, onClose, drawnItems, setDrawnItems }) {
         }).addTo(mapRef);
         setDrawnItems((prev) => [...prev, { type: 'line', layer: line, points }]);
       }
-      // Сброс только текущего штриха, инструмент остаётся активным
+      // Сброс только текущего штриха инструмент остаётся активным
       if (drawingRef.current.previewShape && mapRef) {
         mapRef.removeLayer(drawingRef.current.previewShape);
       }
@@ -256,12 +280,18 @@ function DrawingMode({ mapRef, isActive, onClose, drawnItems, setDrawnItems }) {
 
     mapRef.on('mousedown', handleMouseDown);
     mapRef.on('mousemove', handleMouseMove);
+    mapRef.on('touchstart', handleTouchStart);
+    mapRef.on('touchmove', handleTouchMove);
     window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('touchend', handleMouseUp);
 
     activeCleanupRef.current = () => {
       mapRef.off('mousedown', handleMouseDown);
       mapRef.off('mousemove', handleMouseMove);
+      mapRef.off('touchstart', handleTouchStart);
+      mapRef.off('touchmove', handleTouchMove);
       window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('touchend', handleMouseUp);
       resetDrawing();
     };
   };
@@ -269,9 +299,15 @@ function DrawingMode({ mapRef, isActive, onClose, drawnItems, setDrawnItems }) {
   // Рисование прямоугольника через Drag & Drop
   const startRectangle = () => {
     if (!mapRef) return;
-    finishTool({ enableDrag: false }); // Завершить предыдущий инструмент
+    finishTool({ enableDrag: false }); 
     setCurrentTool('rectangle');
     mapRef.dragging.disable();
+
+    const getTouchCoords = (touch) => {
+      const containerPoint = L.point(touch.clientX, touch.clientY);
+      const layerPoint = mapRef.containerPointToLayerPoint(containerPoint);
+      return mapRef.layerPointToLatLng(layerPoint);
+    };
 
     const handleMouseDown = (e) => {
       if (spacePressed) return;
@@ -279,10 +315,37 @@ function DrawingMode({ mapRef, isActive, onClose, drawnItems, setDrawnItems }) {
       drawingRef.current.startPoint = mapRef.mouseEventToLatLng(e.originalEvent);
     };
 
+    const handleTouchStart = (e) => {
+      if (spacePressed || e.touches.length !== 1) return;
+      e.preventDefault();
+      setIsDrawing(true);
+      drawingRef.current.startPoint = getTouchCoords(e.touches[0]);
+    };
+
     const handleMouseMove = (e) => {
       if (!drawingRef.current.startPoint || spacePressed) return;
 
       const endPoint = mapRef.mouseEventToLatLng(e.originalEvent);
+      const bounds = L.latLngBounds([drawingRef.current.startPoint, endPoint]);
+
+      if (drawingRef.current.previewShape) {
+        mapRef.removeLayer(drawingRef.current.previewShape);
+      }
+
+      drawingRef.current.previewShape = L.rectangle(bounds, {
+        color: '#9d4aff',
+        fillColor: '#9d4aff',
+        fillOpacity: 0.2,
+        weight: 2,
+        dashArray: '5, 5',
+      }).addTo(mapRef);
+    };
+
+    const handleTouchMove = (e) => {
+      if (!drawingRef.current.startPoint || spacePressed || e.touches.length !== 1) return;
+      e.preventDefault();
+
+      const endPoint = getTouchCoords(e.touches[0]);
       const bounds = L.latLngBounds([drawingRef.current.startPoint, endPoint]);
 
       if (drawingRef.current.previewShape) {
@@ -322,12 +385,18 @@ function DrawingMode({ mapRef, isActive, onClose, drawnItems, setDrawnItems }) {
 
     mapRef.on('mousedown', handleMouseDown);
     mapRef.on('mousemove', handleMouseMove);
+    mapRef.on('touchstart', handleTouchStart);
+    mapRef.on('touchmove', handleTouchMove);
     window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('touchend', handleMouseUp);
 
     activeCleanupRef.current = () => {
       mapRef.off('mousedown', handleMouseDown);
       mapRef.off('mousemove', handleMouseMove);
+      mapRef.off('touchstart', handleTouchStart);
+      mapRef.off('touchmove', handleTouchMove);
       window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('touchend', handleMouseUp);
       resetDrawing();
     };
   };
@@ -335,9 +404,15 @@ function DrawingMode({ mapRef, isActive, onClose, drawnItems, setDrawnItems }) {
   // Рисование круга через Drag & Drop
   const startCircle = () => {
     if (!mapRef) return;
-    finishTool({ enableDrag: false }); // Завершить предыдущий инструмент
+    finishTool({ enableDrag: false }); 
     setCurrentTool('circle');
     mapRef.dragging.disable();
+
+    const getTouchCoords = (touch) => {
+      const containerPoint = L.point(touch.clientX, touch.clientY);
+      const layerPoint = mapRef.containerPointToLayerPoint(containerPoint);
+      return mapRef.layerPointToLatLng(layerPoint);
+    };
 
     const handleMouseDown = (e) => {
       if (spacePressed) return;
@@ -345,10 +420,41 @@ function DrawingMode({ mapRef, isActive, onClose, drawnItems, setDrawnItems }) {
       drawingRef.current.startPoint = mapRef.mouseEventToLatLng(e.originalEvent);
     };
 
+    const handleTouchStart = (e) => {
+      if (spacePressed || e.touches.length !== 1) return;
+      e.preventDefault();
+      setIsDrawing(true);
+      drawingRef.current.startPoint = getTouchCoords(e.touches[0]);
+    };
+
     const handleMouseMove = (e) => {
       if (!drawingRef.current.startPoint || spacePressed) return;
 
       const endPoint = mapRef.mouseEventToLatLng(e.originalEvent);
+      const radius = Math.sqrt(
+        Math.pow(drawingRef.current.startPoint.lat - endPoint.lat, 2) +
+        Math.pow(drawingRef.current.startPoint.lng - endPoint.lng, 2)
+      ) * 111000;
+
+      if (drawingRef.current.previewShape) {
+        mapRef.removeLayer(drawingRef.current.previewShape);
+      }
+
+      drawingRef.current.previewShape = L.circle(drawingRef.current.startPoint, {
+        radius: Math.max(radius, 10),
+        color: '#4aff9d',
+        fillColor: '#4aff9d',
+        fillOpacity: 0.2,
+        weight: 2,
+        dashArray: '5, 5',
+      }).addTo(mapRef);
+    };
+
+    const handleTouchMove = (e) => {
+      if (!drawingRef.current.startPoint || spacePressed || e.touches.length !== 1) return;
+      e.preventDefault();
+
+      const endPoint = getTouchCoords(e.touches[0]);
       const radius = Math.sqrt(
         Math.pow(drawingRef.current.startPoint.lat - endPoint.lat, 2) +
         Math.pow(drawingRef.current.startPoint.lng - endPoint.lng, 2)
@@ -394,12 +500,18 @@ function DrawingMode({ mapRef, isActive, onClose, drawnItems, setDrawnItems }) {
 
     mapRef.on('mousedown', handleMouseDown);
     mapRef.on('mousemove', handleMouseMove);
+    mapRef.on('touchstart', handleTouchStart);
+    mapRef.on('touchmove', handleTouchMove);
     window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('touchend', handleMouseUp);
 
     activeCleanupRef.current = () => {
       mapRef.off('mousedown', handleMouseDown);
       mapRef.off('mousemove', handleMouseMove);
+      mapRef.off('touchstart', handleTouchStart);
+      mapRef.off('touchmove', handleTouchMove);
       window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('touchend', handleMouseUp);
       resetDrawing();
     };
   };
@@ -407,13 +519,27 @@ function DrawingMode({ mapRef, isActive, onClose, drawnItems, setDrawnItems }) {
   // Свободное рисование (карандаш) через Drag
   const startFreehand = () => {
     if (!mapRef) return;
-    finishTool({ enableDrag: false }); // Завершить предыдущий инструмент
+    finishTool({ enableDrag: false }); 
     setCurrentTool('freehand');
     mapRef.dragging.disable();
     const points = [];
 
+    const getTouchCoords = (touch) => {
+      const containerPoint = L.point(touch.clientX, touch.clientY);
+      const layerPoint = mapRef.containerPointToLayerPoint(containerPoint);
+      return mapRef.layerPointToLatLng(layerPoint);
+    };
+
     const handleMouseDown = (e) => {
       if (spacePressed) return;
+      points.length = 0;
+      setIsDrawing(true);
+      drawingRef.current.startPoint = true;
+    };
+
+    const handleTouchStart = (e) => {
+      if (spacePressed || e.touches.length !== 1) return;
+      e.preventDefault();
       points.length = 0;
       setIsDrawing(true);
       drawingRef.current.startPoint = true;
@@ -423,6 +549,25 @@ function DrawingMode({ mapRef, isActive, onClose, drawnItems, setDrawnItems }) {
       if (!drawingRef.current.startPoint || spacePressed) return;
 
       const point = mapRef.mouseEventToLatLng(e.originalEvent);
+      points.push(point);
+
+      if (points.length > 1) {
+        if (!drawingRef.current.previewShape) {
+          drawingRef.current.previewShape = L.polyline(points, {
+            color: '#ff4a7d',
+            weight: 2,
+          }).addTo(mapRef);
+        } else {
+          drawingRef.current.previewShape.setLatLngs(points);
+        }
+      }
+    };
+
+    const handleTouchMove = (e) => {
+      if (!drawingRef.current.startPoint || spacePressed || e.touches.length !== 1) return;
+      e.preventDefault();
+
+      const point = getTouchCoords(e.touches[0]);
       points.push(point);
 
       if (points.length > 1) {
@@ -458,12 +603,18 @@ function DrawingMode({ mapRef, isActive, onClose, drawnItems, setDrawnItems }) {
 
     mapRef.on('mousedown', handleMouseDown);
     mapRef.on('mousemove', handleMouseMove);
+    mapRef.on('touchstart', handleTouchStart);
+    mapRef.on('touchmove', handleTouchMove);
     window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('touchend', handleMouseUp);
 
     activeCleanupRef.current = () => {
       mapRef.off('mousedown', handleMouseDown);
       mapRef.off('mousemove', handleMouseMove);
+      mapRef.off('touchstart', handleTouchStart);
+      mapRef.off('touchmove', handleTouchMove);
       window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('touchend', handleMouseUp);
       resetDrawing();
     };
   };
@@ -483,7 +634,6 @@ function DrawingMode({ mapRef, isActive, onClose, drawnItems, setDrawnItems }) {
     }
   };
 
-  // Принудительный контроль drag: добавили зависимость isDrawing чтобы после завершения штриха drag снова выключался
   useEffect(() => {
     if (!isActive || !mapRef) return;
     if (currentTool && currentTool !== 'hand' && !spacePressed) {
@@ -496,11 +646,10 @@ function DrawingMode({ mapRef, isActive, onClose, drawnItems, setDrawnItems }) {
 
   const startHand = () => {
     if (!mapRef) return;
-    // Завершить другой инструмент, но не отключать перетаскивание
     if (currentTool && currentTool !== 'hand') {
       finishTool({ enableDrag: true });
     }
-    activeCleanupRef.current = null; // Рука не имеет специальных слушателей
+    activeCleanupRef.current = null; 
     setIsDrawing(false);
     setCurrentTool('hand');
     mapRef.dragging.enable();
@@ -515,7 +664,7 @@ function DrawingMode({ mapRef, isActive, onClose, drawnItems, setDrawnItems }) {
     }
   };
 
-  // Инструмент Ластик - удалять фигуры кликом (используем ref, чтобы брать актуальные фигуры)
+  // Инструмент Ластик 
   const startEraser = () => {
     if (!mapRef) return;
     finishTool({ enableDrag: false });

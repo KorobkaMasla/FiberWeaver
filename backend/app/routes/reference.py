@@ -9,7 +9,7 @@ from ..schemas.object_type import ObjectType as ObjectTypeSchema, ObjectTypeCrea
 router = APIRouter(prefix="/api/reference", tags=["reference"])
 
 
-# Cable Types Endpoints
+
 @router.get("/cable-types", response_model=list[CableTypeSchema])
 def get_cable_types(db: Session = Depends(get_db)):
     """Get all cable types"""
@@ -32,7 +32,7 @@ def create_cable_type(cable_type: CableTypeCreate, db: Session = Depends(get_db)
     return db_cable_type
 
 
-# Object Types Endpoints
+
 @router.get("/object-types", response_model=list[ObjectTypeSchema])
 def get_object_types(db: Session = Depends(get_db)):
     """Get all object types"""

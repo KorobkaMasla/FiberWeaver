@@ -2,7 +2,7 @@ import React from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, Circle, useMapEvents } from 'react-leaflet';
 import { createMarkerIcon, getCableColor, calculateDistance } from './mapEditorUtils';
 
-// Internal map events helper component
+// Помощник событий карты
 function MapEvents({ measureMode, addingPoint, pickingCoordinates, drawCableMode, onMapClick, onMapMouseMove }) {
   useMapEvents({
     mousedown(e) {
@@ -20,7 +20,7 @@ function MapEvents({ measureMode, addingPoint, pickingCoordinates, drawCableMode
       }
     },
     click(e) {
-      if (drawCableMode) return; // ignore clicks while drawing cable
+      if (drawCableMode) return; 
       if (measureMode || pickingCoordinates || addingPoint) {
         onMapClick(e.latlng);
       }
@@ -68,10 +68,8 @@ function MapCanvas(props) {
     visibleCableTypes = new Set(['optical', 'copper'])
   } = props;
 
-  // Filter objects based on visibility
   const visibleObjects = objects.filter(obj => visibleObjectTypes.has(obj.object_type));
   
-  // Filter cables based on visibility
   const visibleCables = cables.filter(cable => visibleCableTypes.has(cable.cable_type));
 
   return (
@@ -96,7 +94,6 @@ function MapCanvas(props) {
       {visibleCables.map(cable => {
         const fromObj = objects.find(o => o.id === cable.from_object_id);
         const toObj = objects.find(o => o.id === cable.to_object_id);
-        // Only render cable if both objects exist (but they don't need to be visible)
         if (!fromObj || !toObj) return null;
         return (
           <Polyline
@@ -283,7 +280,6 @@ function MapCanvas(props) {
         <Polyline positions={measurePoints} pathOptions={{ color: '#ff6b6b', dashArray: '5, 5', weight: 2 }} />
       )}
 
-      {/* Selection feature removed */}
     </MapContainer>
   );
 }

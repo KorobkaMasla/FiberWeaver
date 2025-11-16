@@ -4,7 +4,6 @@ from sqlalchemy.orm import relationship
 from ..database.database import Base
 
 
-# Association table для many-to-many связи между users и roles
 user_roles = Table(
     'user_roles',
     Base.metadata,
@@ -26,7 +25,6 @@ class User(Base):
     lockout_until = Column(DateTime, nullable=True)
     last_failed_login_time = Column(DateTime, nullable=True)
     
-    # Отношение к ролям
     roles = relationship("Role", secondary=user_roles, back_populates="users")
 
 
@@ -36,9 +34,7 @@ class Role(Base):
     role_id = Column(Integer, primary_key=True, index=True)
     role_name = Column(String, unique=True, nullable=False)
     
-    # Отношение к пользователям
-    users = relationship("User", secondary=user_roles, back_populates="roles")
-    # Отношение к правам
+    users = relationship("User", secondary=user_roles, back_populates="roles")  
     permissions = relationship("Permission", secondary="role_permissions", back_populates="roles")
 
 
@@ -49,11 +45,9 @@ class Permission(Base):
     permission_name = Column(String, unique=True, nullable=False)
     description = Column(Text)
     
-    # Отношение к ролям
     roles = relationship("Role", secondary="role_permissions", back_populates="permissions")
 
 
-# Ассоциационная таблица для many-to-many связи между roles и permissions
 role_permissions = Table(
     'role_permissions',
     Base.metadata,

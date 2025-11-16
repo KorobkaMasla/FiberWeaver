@@ -1,19 +1,20 @@
 import React, { useState } from 'react';
 
-function SearchFilterMenu({
-  type, // 'objects' or 'cables'
-  objectTypes = [],
-  objectTypeEmojis,
-  objectTypeNames,
-  cableTypes = [],
-  selectedFilters,
-  onFilterChange
-}) {
+function SearchFilterMenu(props) {
+  const {
+    type = 'objects',
+    objectTypes = [],
+    objectTypeEmojis,
+    objectTypeNames,
+    cableTypes = [],
+    selectedFilters,
+    onFilterChange
+  } = props;
+
   const [showMenu, setShowMenu] = useState(false);
 
   const isObjects = type === 'objects';
   
-  // Для объектов - используем данные из БД если доступны, иначе hardcoded
   const objectFilterOptions = objectTypes.length > 0
     ? objectTypes.map(objType => ({
         value: objType.name,

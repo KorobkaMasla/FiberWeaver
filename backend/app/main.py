@@ -7,15 +7,12 @@ from .models.cable_type import CableType
 from .models.object_type import ObjectType
 from .core.config import settings
 
-# Создание всех таблиц в базе данных
 Base.metadata.create_all(bind=engine)
 
-# Инициализация справочных данных (типы кабелей и объектов)
 def init_reference_data():
     """Инициализировать справочные данные если их нет"""
     db = SessionLocal()
     try:
-        # Инициализация типов кабелей
         if db.query(CableType).count() == 0:
             cable_types = [
                 CableType(name="Оптический", fiber_count=None, color="#0087BE", description="Оптический кабель (голубой)"),
@@ -32,7 +29,6 @@ def init_reference_data():
             db.add_all(cable_types)
             db.commit()
         
-        # Инициализация типов объектов
         if db.query(ObjectType).count() == 0:
             object_types = [
                 ObjectType(name="node", display_name="Узел", emoji="⚙️"),
@@ -50,7 +46,6 @@ def init_reference_data():
     finally:
         db.close()
 
-# Инициализировать справочные данные при запуске
 init_reference_data()
 
 app = FastAPI(
@@ -62,7 +57,6 @@ app = FastAPI(
     openapi_url="/openapi.json",
 )
 
-# CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
@@ -71,7 +65,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Включение маршрутов (auth должен быть первым)
 app.include_router(auth.router, tags=["auth"])
 app.include_router(network_objects.router, tags=["network_objects"])
 app.include_router(cables.router, tags=["cables"])

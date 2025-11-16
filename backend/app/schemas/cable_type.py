@@ -4,7 +4,7 @@ from typing import Optional
 
 class CableTypeBase(BaseModel):
     name: str
-    fiber_count: Optional[int] = None  # Can be None for generic types like "Оптический" and "Медный"
+    fiber_count: Optional[int] = None  
     description: Optional[str] = None
     color: str
 

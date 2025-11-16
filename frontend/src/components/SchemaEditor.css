@@ -79,6 +79,7 @@
   flex-direction: column;
   gap: var(--spacing-sm);
   overflow-y: auto;
+  width: 100%;
 }
 
 .cable-item {
@@ -92,7 +93,9 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  flex-shrink: 0;
+  flex-shrink: 1;
+  width: 100%;
+  box-sizing: border-box;
   position: relative;
 }
 
@@ -357,6 +360,13 @@
   transform: scale(1.02);
 }
 
+.fiber-item-draggable.selected-fiber {
+  border-color: var(--accent-primary);
+  background: linear-gradient(135deg, rgba(74, 158, 255, 0.15), rgba(74, 158, 255, 0.05));
+  box-shadow: 0 0 12px rgba(74, 158, 255, 0.4), inset 0 0 8px rgba(74, 158, 255, 0.1);
+  transform: scale(1.05);
+}
+
 .fiber-number {
   font-weight: 600;
   font-size: 11px;
@@ -564,7 +574,7 @@
   color: var(--text-secondary);
 }
 
-/* Сетка отображения (старый стиль, сохранён для справки) */
+/* Сетка отображения */
 .fiber-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -979,7 +989,7 @@
   text-align: center;
 }
 
-/* Modal Dialog */
+/* Модальный диалог */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -1058,7 +1068,7 @@
   }
 }
 
-/* ===== TABLET OPTIMIZATION (768px - 1024px) ===== */
+/* Оптимизация планшета (768–1024 пикс.) */
 @media (max-width: 1024px) and (min-width: 769px) {
   .schema-editor {
     gap: var(--spacing-md);
@@ -1080,101 +1090,212 @@
   }
 }
 
-/* ===== MOBILE OPTIMIZATION (<768px) ===== */
+/* Кнопка «Назад» для мобильных устройств */
+.btn-back-mobile {
+  display: none;
+}
+
+/* Мобильная оптимизация (<768 пикселей) */
 @media (max-width: 768px) {
+  /* Переключение мобильного просмотра: показать/скрыть панель кабелей и редактор */
+  .cables-panel.mobile-hidden {
+    display: none;
+  }
+
+  /* Скрыть контейнер схемы, когда отображается панель кабелей (просмотр списка) */
+  .cables-panel:not(.mobile-hidden) ~ .schema-container {
+    display: none !important;
+  }
+
+  /* Скрыть заполнитель на мобильном телефоне */
+  .cables-panel:not(.mobile-hidden) ~ .placeholder {
+    display: none !important;
+  }
+
+  /* Показывать контейнер схемы, когда панель кабелей скрыта (вид редактора) */
+  .cables-panel.mobile-hidden ~ .schema-container {
+    display: flex !important;
+  }
+
   .schema-editor {
     flex-direction: column;
-    gap: var(--spacing-md);
-    padding: var(--spacing-md);
+    gap: 0 !important;
+    padding: 0 !important;
+    height: 100vh !important;
+    width: 100vw !important;
+    overflow: hidden !important;
   }
 
   .cables-panel {
-    width: 100%;
-    max-height: 120px;
-    padding: var(--spacing-md);
+    width: 100% !important;
+    height: 100% !important;
+    padding: 8px;
+    flex-shrink: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    flex: 1 !important;
+    max-height: none !important;
   }
 
   .panel-header {
-    margin-bottom: var(--spacing-md);
+    margin-bottom: 6px;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .panel-header h3 {
+    font-size: 16px;
+    margin: 0;
+  }
+
+  .cable-count {
+    width: 28px;
+    height: 28px;
+    font-size: 13px;
+  }
+
+  .cable-search-input {
+    font-size: 14px;
+    padding: 10px !important;
+    margin-bottom: 8px;
+    flex-shrink: 0;
+    min-height: 40px;
+  }
+
+  .search-box {
+    flex-shrink: 0;
   }
 
   .cable-items {
-    flex-direction: row;
-    overflow-x: auto;
-    overflow-y: hidden;
-    gap: var(--spacing-sm);
-    padding-bottom: var(--spacing-sm);
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+    gap: 6px;
+    width: 100%;
+    flex: 1;
   }
 
   .cable-item {
-    flex-shrink: 0;
-    width: 140px;
+    flex-shrink: 1;
+    width: 100%;
+    box-sizing: border-box;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-sm);
+    gap: 10px;
+    padding: 12px;
     position: relative;
+    min-height: 60px;
   }
 
   .cable-icon {
     font-size: 24px;
+    flex-shrink: 0;
   }
 
   .cable-info {
-    text-align: center;
-    width: 100%;
+    text-align: left;
+    flex: 1;
+    min-width: 0;
   }
 
   .cable-info strong {
-    font-size: 12px;
-    white-space: normal;
+    font-size: 15px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
   }
 
   .cable-info small {
-    font-size: 10px;
+    font-size: 12px;
+    color: var(--text-tertiary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
   }
 
   .cable-splice-badge {
     position: absolute;
-    top: 0;
+    top: -8px;
     right: 0;
+    width: 24px;
+    height: 24px;
+    font-size: 12px;
   }
 
   .schema-container {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-md);
+    gap: 6px;
     min-height: 0;
     overflow: hidden;
+    padding: 0;
+    width: 100%;
   }
 
   .schema-header {
-    padding: 0;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--bg-tertiary);
+    flex-shrink: 0;
+  }
+
+  .schema-header-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-back-mobile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--bg-hover);
+    color: var(--text-primary);
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all var(--transition-fast);
+    flex-shrink: 0;
+  }
+
+  .btn-back-mobile:hover {
+    background-color: var(--bg-hover);
+  }
+
+  .btn-back-mobile:active {
+    transform: scale(0.95);
   }
 
   .schema-header h2 {
-    font-size: 18px;
-    margin: 0 0 var(--spacing-sm) 0;
+    font-size: 14px;
+    margin: 0 0 4px 0;
+    flex: 1;
   }
 
   .schema-meta {
     flex-wrap: wrap;
-    gap: var(--spacing-sm);
+    gap: 4px;
   }
 
   .meta-badge {
-    font-size: 12px;
-    padding: 4px 8px;
+    font-size: 10px;
+    padding: 2px 6px;
   }
 
   .schema-content {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-lg);
+    gap: 8px;
     overflow-y: auto;
     min-height: 0;
+    flex: 1;
   }
 
   .fiber-visualization {
@@ -1182,40 +1303,49 @@
   }
 
   .fiber-visualization h3 {
-    margin: 0 0 var(--spacing-md) 0;
-    font-size: 14px;
+    margin: 0 0 6px 0;
+    font-size: 12px;
+  }
+
+  .viz-hint {
+    font-size: 10px;
   }
 
   .fiber-grid {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 4px;
   }
 
   .fiber-item {
     width: 100%;
-    min-height: 60px;
+    min-height: 40px;
   }
 
   .fiber-circle {
-    width: 24px;
-    height: 24px;
+    width: 18px;
+    height: 18px;
+    font-size: 9px;
   }
 
   .form-section {
     flex-shrink: 0;
+    padding: 8px;
+    border: 1px solid var(--bg-tertiary);
+    border-radius: 4px;
+    display: none;
   }
 
   .form-header {
-    margin-bottom: var(--spacing-md);
+    margin-bottom: 6px;
   }
 
   .form-header h3 {
-    margin: 0 0 var(--spacing-sm) 0;
-    font-size: 14px;
+    margin: 0 0 4px 0;
+    font-size: 12px;
   }
 
   .form-hint {
-    font-size: 11px;
+    font-size: 10px;
   }
 
   .form-group-pair {
@@ -1223,24 +1353,25 @@
   }
 
   .form-divider {
-    padding: var(--spacing-sm) 0;
+    padding: 4px 0;
   }
 
   .arrow-icon {
-    font-size: 18px;
+    font-size: 14px;
   }
 
   .cable-selector {
     flex-direction: column;
     align-items: flex-start;
+    gap: 4px;
   }
 
   .cable-name-display {
-    font-size: 13px;
+    font-size: 11px;
   }
 
   .cable-meta {
-    font-size: 11px;
+    font-size: 9px;
   }
 
   .btn-primary,
@@ -1251,7 +1382,7 @@
 
   .form-group input,
   .form-group select {
-    font-size: 16px; /* Prevents zoom on iOS */
+    font-size: 16px; /* Предотвращает масштабирование на iOS */
     min-height: 44px;
     padding: 12px;
   }
@@ -1260,7 +1391,7 @@
     flex: 1;
     min-height: 0;
     overflow: hidden;
-    display: flex;
+    display: none;
     flex-direction: column;
   }
 
@@ -1389,53 +1520,265 @@
   }
 }
 
-/* ===== SMALL PHONE OPTIMIZATION (<480px) ===== */
+/* Оптимизация для маленьких телефонов (<480 пикселей) */
 @media (max-width: 480px) {
+  /* Переключение мобильного просмотра */
+  .cables-panel.mobile-hidden {
+    display: none;
+  }
+
+  /* Скрыть контейнер схемы когда отображается панель кабелей (просмотр списка) */
+  .cables-panel:not(.mobile-hidden) ~ .schema-container {
+    display: none !important;
+  }
+
+  /* Скрыть заполнитель на телефоне */
+  .cables-panel:not(.mobile-hidden) ~ .placeholder {
+    display: none !important;
+  }
+
+  /* Показывать контейнер схемы, когда панель кабелей скрыта (вид редактора) */
+  .cables-panel.mobile-hidden ~ .schema-container {
+    display: flex !important;
+  }
+
   .schema-editor {
-    padding: var(--spacing-sm);
+    padding: 0 !important;
+    gap: 0 !important;
+    height: 100vh !important;
+    width: 100vw !important;
+    overflow: hidden !important;
   }
 
   .cables-panel {
-    max-height: 100px;
-    padding: var(--spacing-sm);
+    max-height: none !important;
+    height: 100% !important;
+    padding: 4px;
+    width: 100% !important;
+    flex-shrink: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    flex: 1 !important;
+  }
+
+  .panel-header {
+    margin-bottom: 4px;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .panel-header h3 {
+    font-size: 15px;
+    margin: 0;
+  }
+
+  .cable-count {
+    width: 26px;
+    height: 26px;
+    font-size: 12px;
+  }
+
+  .cable-search-input {
+    font-size: 13px;
+    padding: 8px !important;
+    margin-bottom: 6px;
+    flex-shrink: 0;
+    min-height: 38px;
+  }
+
+  .search-box {
+    flex-shrink: 0;
+  }
+
+  .cable-items {
+    gap: 4px;
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
   .cable-item {
-    width: 120px;
-    padding: 6px;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    flex-shrink: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    min-height: 56px;
   }
 
   .cable-icon {
-    font-size: 20px;
+    font-size: 22px;
+    flex-shrink: 0;
   }
 
-  .fiber-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 6px;
+  .cable-info {
+    text-align: left;
+    flex: 1;
+    min-width: 0;
   }
 
-  .fiber-item {
-    min-height: 50px;
+  .cable-info strong {
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
   }
 
-  .fiber-circle {
-    width: 20px;
-    height: 20px;
+  .cable-info small {
+    font-size: 11px;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
-  .fiber-item label {
-    font-size: 10px;
+  .cable-splice-badge {
+    width: 22px;
+    height: 22px;
+    font-size: 11px;
+  }
+
+  .schema-container {
+    flex: 1;
+    gap: 4px;
+    padding: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .schema-header {
+    padding: 4px 0;
+    border-bottom: 1px solid var(--bg-tertiary);
+    flex-shrink: 0;
+  }
+
+  .schema-header-top {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .btn-back-mobile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--bg-hover);
+    color: var(--text-primary);
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 500;
+    transition: all var(--transition-fast);
+    flex-shrink: 0;
+  }
+
+  .btn-back-mobile:hover {
+    background-color: var(--bg-hover);
+  }
+
+  .btn-back-mobile:active {
+    transform: scale(0.95);
   }
 
   .schema-header h2 {
-    font-size: 16px;
+    font-size: 12px;
+    margin: 0 0 2px 0;
+    flex: 1;
+  }
+
+  .schema-meta {
+    gap: 2px;
+  }
+
+  .meta-badge {
+    font-size: 9px;
+    padding: 2px 4px;
+  }
+
+  .schema-content {
+    gap: 4px;
+  }
+
+  .fiber-visualization {
+    flex-shrink: 0;
+  }
+
+  .fiber-visualization h3 {
+    margin: 0 0 4px 0;
+    font-size: 11px;
+  }
+
+  .viz-hint {
+    font-size: 9px;
+  }
+
+  .fiber-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 3px;
+  }
+
+  .fiber-item {
+    min-height: 35px;
+  }
+
+  .fiber-circle {
+    width: 16px;
+    height: 16px;
+    font-size: 8px;
+  }
+
+  .fiber-item label {
+    font-size: 8px;
+  }
+
+  .form-section {
+    padding: 6px;
+    border: 1px solid var(--bg-tertiary);
+    border-radius: 3px;
+    flex-shrink: 0;
+    display: none;
+  }
+
+  .form-header h3 {
+    font-size: 11px;
+    margin: 0 0 3px 0;
+  }
+
+  .form-hint {
+    font-size: 9px;
   }
 
   .form-group input,
   .form-group select {
-    font-size: 16px;
-    min-height: 40px;
-    padding: 10px;
+    font-size: 11px;
+    min-height: 32px;
+    padding: 6px;
+  }
+
+  .arrow-icon {
+    font-size: 12px;
+  }
+
+  .cable-selector {
+    gap: 2px;
+  }
+
+  .cable-name-display {
+    font-size: 10px;
+  }
+
+  .cable-meta {
+    font-size: 8px;
   }
 
   .splice-connection {
@@ -1444,28 +1787,35 @@
   }
 
   .connection-label {
-    font-size: 11px;
+    font-size: 9px;
     gap: 2px;
   }
 
   .fiber-badge,
   .cable-badge {
-    padding: 2px 4px;
-    font-size: 9px;
+    padding: 1px 3px;
+    font-size: 8px;
+  }
+
+  .btn-delete {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
   }
 
   .modal-dialog {
     width: 95%;
-    padding: var(--spacing-md);
+    padding: 8px;
   }
 
   .empty-state {
-    font-size: 12px;
-    padding: var(--spacing-md);
+    font-size: 11px;
+    padding: 8px;
   }
 }
 
-/* Validation messages */
+/* Сообщения проверки */
 .validation-messages {
   display: flex;
   flex-direction: column;

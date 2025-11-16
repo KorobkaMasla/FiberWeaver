@@ -15,10 +15,10 @@ router = APIRouter(prefix="/api/regions", tags=["regions"])
 @router.post("/", response_model=RegionResponse)
 def create_region(region: RegionCreate, db: Session = Depends(get_db)):
     """Create a new region"""
-    # Check if region with this name already exists
+
     existing = db.query(Region).filter(Region.name == region.name).first()
     if existing:
-        return existing  # Return existing region instead of creating duplicate
+        return existing  
     
     db_region = Region(**region.dict())
     db.add(db_region)
@@ -49,7 +49,7 @@ def get_region(region_id: int, db: Session = Depends(get_db)):
     if not region:
         raise HTTPException(status_code=404, detail="Region not found")
     
-    # Get objects for this region from junction table
+    
     region_objects_result = db.execute(text(
         f"SELECT no.* FROM network_objects no "
         f"INNER JOIN region_objects ro ON no.network_object_id = ro.network_object_id "
@@ -59,12 +59,12 @@ def get_region(region_id: int, db: Session = Depends(get_db)):
     network_objects = []
     for row in region_objects_result:
         obj_dict = dict(row._mapping) if hasattr(row, '_mapping') else row
-        # Map network_object_id to id for frontend consistency
+        
         if 'network_object_id' in obj_dict:
             obj_dict['id'] = obj_dict['network_object_id']
         network_objects.append(obj_dict)
     
-    # Get cables for this region from junction table
+    
     region_cables_result = db.execute(text(
         f"SELECT c.* FROM cables c "
         f"INNER JOIN region_cables rc ON c.cable_id = rc.cable_id "
@@ -74,12 +74,12 @@ def get_region(region_id: int, db: Session = Depends(get_db)):
     cables = []
     for row in region_cables_result:
         cable_dict = dict(row._mapping) if hasattr(row, '_mapping') else row
-        # Map cable_id to id for frontend consistency
+        
         if 'cable_id' in cable_dict:
             cable_dict['id'] = cable_dict['cable_id']
         cables.append(cable_dict)
     
-    # Construct response with objects and cables
+   
     response = {
         'region_id': region.region_id,
         'name': region.name,
@@ -185,8 +185,7 @@ def add_cable_to_region(region_id: int, cable_id: int, db: Session = Depends(get
     
     if not region or not cable:
         raise HTTPException(status_code=404, detail="Region or cable not found")
-    
-    # Check if both endpoints are in the region
+        
     obj_count = db.execute(text(
         f"SELECT COUNT(*) FROM region_objects WHERE region_id = {region_id} "
         f"AND network_object_id IN ({cable.from_object_id}, {cable.to_object_id})"

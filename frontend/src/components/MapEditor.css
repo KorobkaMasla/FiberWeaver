@@ -500,7 +500,9 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
-  flex-shrink: 0;
+  flex-shrink: 1;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .cable-color {
@@ -643,6 +645,7 @@
   display: flex;
   gap: 4px;
   flex-shrink: 0;
+  margin-left: auto;
 }
 
 /* Панель инструментов */
@@ -962,6 +965,59 @@
     padding: 10px;
     font-size: 11px;
   }
+
+  .cable-item {
+    padding: 10px;
+    gap: 8px;
+    flex-shrink: 1;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .cables-list {
+    width: 100%;
+  }
+
+  .cables-scroll {
+    padding: 0 8px 8px 8px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .cable-color {
+    width: 10px;
+    height: 10px;
+  }
+
+  .cable-info {
+    flex: 1;
+  }
+
+  .cable-info strong {
+    font-size: 12px;
+  }
+
+  .cable-info small {
+    font-size: 11px;
+  }
+
+  .cable-tiny {
+    font-size: 10px;
+  }
+
+  .cable-type-badge {
+    display: none;
+  }
+
+  .item-actions {
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .item-actions button {
+    padding: 4px 6px !important;
+    font-size: 11px !important;
+  }
 }
 
 @media (max-width: 480px) {
@@ -984,6 +1040,65 @@
     border-radius: 8px;
   }
 
+  .object-item {
+    padding: 8px;
+    gap: 6px;
+
+  }
+
+  .object-type {
+    font-size: 14px;
+  }
+
+  .object-item {
+    padding: 8px;
+    gap: 6px;
+  }
+
+  .cable-item {
+    padding: 8px;
+    gap: 6px;
+    flex-shrink: 1;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .cables-list {
+    width: 100%;
+  }
+
+  .cables-scroll {
+    padding: 0 6px 6px 6px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .cable-color {
+    width: 8px;
+    height: 8px;
+  }
+
+  .cable-info strong {
+    font-size: 11px;
+  }
+
+  .cable-info small {
+    font-size: 10px;
+  }
+
+  .cable-tiny {
+    font-size: 9px;
+  }
+
+  .cable-type-badge {
+    display: none;
+  }
+
+  .item-actions button {
+    padding: 3px 5px !important;
+    font-size: 10px !important;
+  }
+
   .map-tools-panel {
     bottom: 0;
     left: 0;
@@ -1003,6 +1118,18 @@
     display: flex;
     gap: var(--spacing-xs);
     flex: 1;
+  }
+
+  .layer-select-group {
+    flex: 1;
+    max-width: 120px;
+    min-width: 100px;
+  }
+
+  .layer-select {
+    width: 100%;
+    font-size: 11px;
+    padding: var(--spacing-xs) var(--spacing-sm);
   }
 }
 

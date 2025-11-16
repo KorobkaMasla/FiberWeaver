@@ -16,6 +16,8 @@ function SchemaEditor({ selectedRegions = [], objects = [] }) {
   const [toast, setToast] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [regionObjectIds, setRegionObjectIds] = useState(new Set());
+  const [selectedFiber, setSelectedFiber] = useState(null); // Для click-based соединения на телефонах
+  const [mobileEditorView, setMobileEditorView] = useState(false); // Переключение между списком кабелей и редактором на мобильной версии
   const dragStateRef = useRef(null);
   const svgRef = useRef(null);
   
@@ -58,7 +60,7 @@ function SchemaEditor({ selectedRegions = [], objects = [] }) {
       return cables;
     }
     
-    // Если нет объектов в выбранных регионах, возвращаем пустой массив
+    // Если нет объектов в выбранных регионах возвращаем пустой массив
     if (regionObjectIds.size === 0) {
       return [];
     }
@@ -140,6 +142,7 @@ function SchemaEditor({ selectedRegions = [], objects = [] }) {
 
   const handleCableSelect = (cable) => {
     setSelectedCable(cable);
+    setMobileEditorView(true); 
     setEditingSpliceId(null);
     setSpliceForm({
       from_fiber: 0,
@@ -165,7 +168,6 @@ function SchemaEditor({ selectedRegions = [], objects = [] }) {
     const cable = cables.find(c => c.id === cableId);
     if (!cable) return { valid: false, message: 'Кабель не найден' };
     
-    // Если fiber_count пустой/null, это не оптический кабель
     if (!cable.fiber_count) {
       return { 
         valid: false, 
@@ -182,7 +184,6 @@ function SchemaEditor({ selectedRegions = [], objects = [] }) {
     return { valid: true };
   };
 
-  // Проверка дублирующихся соединений
   const checkDuplicateSplice = (sourceId, sourceFiber, targetId, targetFiber) => {
     const duplicate = splices.find(s => 
       s.cable_id === sourceId && 
@@ -193,7 +194,7 @@ function SchemaEditor({ selectedRegions = [], objects = [] }) {
     return !!duplicate;
   };
 
-  // Проверка, используется ли волокно в другом соединении
+  // Проверка используется ли волокно в другом соединении
   const checkFiberInUse = (cableId, fiberNumber) => {
     const existingSplice = splices.find(s =>
       s.cable_id === cableId && s.fiber_number === fiberNumber
@@ -201,17 +202,17 @@ function SchemaEditor({ selectedRegions = [], objects = [] }) {
     return existingSplice;
   };
 
-  // Проверка, связаны ли два кабеля между собой
+  // Проверка связаны ли два кабеля между собой
   const areCablesConnected = (cableId1, cableId2) => {
     const cable1 = cables.find(c => c.id === cableId1);
     const cable2 = cables.find(c => c.id === cableId2);
     
     if (!cable1 || !cable2) return false;
     
-    // Кабель 1 заканчивается там, где начинается кабель 2
+    // Кабель 1 заканчивается там где начинается кабель 2
     if (cable1.to_object_id === cable2.from_object_id) return true;
     
-    // Кабель 2 заканчивается там, где начинается кабель 1
+    // Кабель 2 заканчивается там где начинается кабель 1
     if (cable2.to_object_id === cable1.from_object_id) return true;
     
     // Оба кабеля заканчиваются в одной точке
@@ -253,7 +254,7 @@ function SchemaEditor({ selectedRegions = [], objects = [] }) {
       return;
     }
 
-    // Проверяем, связаны ли кабели между собой
+    // Проверяем связаны ли кабели между собой
     if (!areCablesConnected(sourceCableId, targetCableId)) {
       setToast({ 
         message: '❌ Эти кабели не связаны между собой на карте. Соедините их сначала, а потом создавайте соединения волокон.', 
@@ -328,6 +329,59 @@ function SchemaEditor({ selectedRegions = [], objects = [] }) {
     dragStateRef.current = null;
   };
 
+  // Функция для click-based соединения волокон на мобилях
+  const handleFiberClick = async (cableId, fiberNumber) => {
+    if (!selectedFiber) {
+      // Выбираем первое волокно
+      setSelectedFiber({ cableId, fiberNumber });
+      setToast({ message: `Выбрано волокно F${fiberNumber}. Нажмите на второе волокно для соединения.`, type: 'info' });
+      return;
+    }
+
+    // Если кликнули на то же волокно отменяем выбор
+    if (selectedFiber.cableId === cableId && selectedFiber.fiberNumber === fiberNumber) {
+      setSelectedFiber(null);
+      setToast({ message: 'Выбор отменён', type: 'info' });
+      return;
+    }
+
+    // Проверка: нельзя соединять волокна из одного кабеля
+    if (selectedFiber.cableId === cableId) {
+      setToast({ message: '❌ Нельзя соединять волокна из одного и того же кабеля', type: 'error' });
+      setSelectedFiber(null);
+      return;
+    }
+
+    // Создаём соединение между двумя волокнами
+    try {
+      const response = await authService.authenticatedFetch('http://localhost:8000/api/fiber-splices/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          cable_id: selectedFiber.cableId,
+          fiber_number: selectedFiber.fiberNumber,
+          splice_to_cable_id: cableId,
+          splice_to_fiber: fiberNumber,
+          notes: null
+        })
+      });
+
+      if (response.ok) {
+        setToast({ message: `✓ Соединение создано: F${selectedFiber.fiberNumber} ↔ F${fiberNumber}`, type: 'success' });
+        setSelectedFiber(null);
+        fetchSplices(selectedCable.id);
+      } else {
+        const error = await response.json();
+        setToast({ message: `Ошибка: ${error.detail || 'Не удалось создать соединение'}`, type: 'error' });
+        setSelectedFiber(null);
+      }
+    } catch (error) {
+      console.error('Error creating splice:', error);
+      setToast({ message: 'Ошибка соединения с сервером', type: 'error' });
+      setSelectedFiber(null);
+    }
+  };
+
   const handleAddSplice = async (e) => {
     e.preventDefault();
     
@@ -337,7 +391,7 @@ function SchemaEditor({ selectedRegions = [], objects = [] }) {
       return;
     }
 
-    // Проверяем, связаны ли кабели между собой
+    // Проверяем связаны ли кабели между собой
     if (!areCablesConnected(selectedCable.id, parseInt(spliceForm.to_cable_id))) {
       setToast({ 
         message: '❌ Эти кабели не связаны между собой на карте. Соедините их сначала, а потом создавайте соединения волокон.', 
@@ -375,7 +429,7 @@ function SchemaEditor({ selectedRegions = [], objects = [] }) {
       return;
     }
 
-    // Проверка, используется ли исходное волокно в другом соединении
+    // Проверка используется ли исходное волокно в другом соединении
     const usedInSource = checkFiberInUse(selectedCable.id, spliceForm.from_fiber);
     if (usedInSource) {
       setToast({ 
@@ -485,7 +539,7 @@ function SchemaEditor({ selectedRegions = [], objects = [] }) {
       });
     }
 
-    // Проверка, используется ли волокно в другом соединении
+    // Проверка используется ли волокно в другом соединении
     if (checkFiberInUse(selectedCable.id, spliceForm.from_fiber)) {
       messages.push({ 
         type: 'warning', 
@@ -498,7 +552,8 @@ function SchemaEditor({ selectedRegions = [], objects = [] }) {
 
   return (
     <div className="schema-editor">
-      <div className="cables-panel">
+      {/* Для ПК всегда отображать панель кабелей слева.*/}
+      <div className={`cables-panel ${mobileEditorView ? 'mobile-hidden' : ''}`}>
         <div className="panel-header">
           <h3>🔗 Кабели</h3>
           <span className="cable-count">{searchedCables.filter(c => c.fiber_count).length}</span>
@@ -543,7 +598,21 @@ function SchemaEditor({ selectedRegions = [], objects = [] }) {
       {selectedCable && (
         <div className="schema-container">
           <div className="schema-header">
-            <h2>📊 {selectedCable.name}</h2>
+            <div className="schema-header-top">
+              {mobileEditorView && (
+                <button 
+                  className="btn-back-mobile"
+                  onClick={() => {
+                    setMobileEditorView(false);
+                    setSelectedFiber(null);
+                  }}
+                  title="Вернуться к списку кабелей"
+                >
+                  ← Назад
+                </button>
+              )}
+              <h2>📊 {selectedCable.name}</h2>
+            </div>
             <div className="schema-meta">
               <span className="meta-badge">{cableTypeNames[selectedCable.cable_type]}</span>
               <span className="meta-badge">{selectedCable.fiber_count} волокон</span>
@@ -556,7 +625,6 @@ function SchemaEditor({ selectedRegions = [], objects = [] }) {
               <small className="viz-hint">Перетаскивайте волокна между кабелями для создания соединений</small>
               
               <div className="interactive-editor">
-                {/* Source Cable */}
                 <div className="cable-visualization-block">
                   <div className="cable-label">📤 {selectedCable.name}</div>
                   <div className="fiber-list">
@@ -564,16 +632,23 @@ function SchemaEditor({ selectedRegions = [], objects = [] }) {
                       const connectedSplice = splices.find(s => s.fiber_number === i);
                       const isUsed = checkFiberInUse(selectedCable.id, i);
                       const targetCableName = connectedSplice ? getCableName(connectedSplice.splice_to_cable_id) : null;
+                      const isSelectedFiber = selectedFiber?.cableId === selectedCable.id && selectedFiber?.fiberNumber === i;
                       
                       return (
                         <div 
                           key={i}
-                          className={`fiber-item-draggable ${connectedSplice ? 'has-connection' : ''} ${isUsed ? 'in-use' : ''}`}
+                          className={`fiber-item-draggable ${connectedSplice ? 'has-connection' : ''} ${isUsed ? 'in-use' : ''} ${isSelectedFiber ? 'selected-fiber' : ''}`}
                           draggable={!isUsed}
                           onDragStart={(e) => !isUsed && handleFiberDragStart(e, selectedCable.id, i)}
-                          onClick={() => connectedSplice && handleDeleteSplice(connectedSplice.id)}
-                          title={isUsed ? `Подключено к ${targetCableName}, F${connectedSplice?.splice_to_fiber}. Кликните чтобы удалить.` : `Перетащите на волокно в другом кабеле`}
-                          style={{ cursor: connectedSplice ? 'pointer' : 'grab' }}
+                          onClick={() => {
+                            if (connectedSplice) {
+                              handleDeleteSplice(connectedSplice.id);
+                            } else if (!isUsed) {
+                              handleFiberClick(selectedCable.id, i);
+                            }
+                          }}
+                          title={isUsed ? `Подключено к ${targetCableName}, F${connectedSplice?.splice_to_fiber}. Кликните чтобы удалить.` : `Перетащите на волокно или кликните для выбора`}
+                          style={{ cursor: connectedSplice ? 'pointer' : isSelectedFiber ? 'cell' : 'grab' }}
                         >
                           <span className="fiber-number">F{i}</span>
                           {connectedSplice && (
@@ -585,7 +660,6 @@ function SchemaEditor({ selectedRegions = [], objects = [] }) {
                   </div>
                 </div>
 
-                {/* Target Cables */}
                 <div className="target-cables-container">
                   {selectedTargetCable ? (
                     <div className="cable-visualization-block target-cable">
@@ -601,11 +675,12 @@ function SchemaEditor({ selectedRegions = [], objects = [] }) {
                           const isUsed = checkFiberInUse(selectedTargetCable.id, i);
                           const connectingFromSplice = splices.find(s => s.splice_to_cable_id === selectedTargetCable.id && s.splice_to_fiber === i);
                           const fromCableName = connectingFromSplice ? getCableName(connectingFromSplice.cable_id) : null;
+                          const isSelectedFiber = selectedFiber?.cableId === selectedTargetCable.id && selectedFiber?.fiberNumber === i;
                           
                           return (
                             <div 
                               key={i}
-                              className={`fiber-item-draggable ${connectingFromSplice ? 'has-connection' : ''} ${isUsed ? 'in-use' : ''}`}
+                              className={`fiber-item-draggable ${connectingFromSplice ? 'has-connection' : ''} ${isUsed ? 'in-use' : ''} ${isSelectedFiber ? 'selected-fiber' : ''}`}
                               draggable={!isUsed}
                               onDragStart={(e) => !isUsed && handleFiberDragStart(e, selectedTargetCable.id, i)}
                               onDragOver={(e) => {
@@ -625,9 +700,15 @@ function SchemaEditor({ selectedRegions = [], objects = [] }) {
                               onDragLeave={(e) => {
                                 e.currentTarget.classList.remove('drag-over');
                               }}
-                              onClick={() => connectingFromSplice && handleDeleteSplice(connectingFromSplice.id)}
-                              title={isUsed ? `Подключено из ${fromCableName}, F${connectingFromSplice?.fiber_number}. Кликните чтобы удалить.` : `Можно соединить с волокном из источника`}
-                              style={{ cursor: connectingFromSplice ? 'pointer' : 'grab' }}
+                              onClick={() => {
+                                if (connectingFromSplice) {
+                                  handleDeleteSplice(connectingFromSplice.id);
+                                } else if (!isUsed) {
+                                  handleFiberClick(selectedTargetCable.id, i);
+                                }
+                              }}
+                              title={isUsed ? `Подключено из ${fromCableName}, F${connectingFromSplice?.fiber_number}. Кликните чтобы удалить.` : `Перетащите или кликните для выбора`}
+                              style={{ cursor: connectingFromSplice ? 'pointer' : isSelectedFiber ? 'cell' : 'grab' }}
                             >
                               <span className="fiber-number">F{i}</span>
                               {connectingFromSplice && (
@@ -678,7 +759,6 @@ function SchemaEditor({ selectedRegions = [], objects = [] }) {
                 <small className="form-hint">Или используйте интерактивный редактор выше</small>
               </div>
               
-              {/* Validation messages */}
               {getValidationMessages().length > 0 && (
                 <div className="validation-messages">
                   {getValidationMessages().map((msg, idx) => (

@@ -15,7 +15,6 @@ try:
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
-    # Check if column already exists
     cursor.execute("PRAGMA table_info(network_objects)")
     columns = {col[1]: col[2] for col in cursor.fetchall()}
     
@@ -23,7 +22,6 @@ try:
         print("Adding object_type_id column...")
         cursor.execute("ALTER TABLE network_objects ADD COLUMN object_type_id INTEGER")
         
-        # Populate object_type_id based on object_type name match
         cursor.execute("""
             UPDATE network_objects
             SET object_type_id = (
@@ -34,15 +32,12 @@ try:
         """)
         
         print("Removing old object_type column...")
-        # SQLite doesn't support direct DROP COLUMN, so we need to recreate the table
-        # Get the current schema
         cursor.execute("""
             SELECT sql FROM sqlite_master 
             WHERE type='table' AND name='network_objects'
         """)
         create_sql = cursor.fetchone()[0]
         
-        # Create a new table without object_type
         cursor.execute("""
             CREATE TABLE network_objects_new (
                 network_object_id INTEGER PRIMARY KEY,
@@ -58,7 +53,6 @@ try:
             )
         """)
         
-        # Copy data from old table
         cursor.execute("""
             INSERT INTO network_objects_new 
             SELECT network_object_id, name, object_type_id, latitude, longitude, 
@@ -66,10 +60,8 @@ try:
             FROM network_objects
         """)
         
-        # Drop old table
         cursor.execute("DROP TABLE network_objects")
         
-        # Rename new table
         cursor.execute("ALTER TABLE network_objects_new RENAME TO network_objects")
         
         conn.commit()

@@ -1,6 +1,5 @@
 import L from 'leaflet';
 
-// Default object type data - used as fallback if DB data not available
 const defaultObjectTypeEmojis = {
   node: '⚙️',
   coupling: '📦',
@@ -25,14 +24,9 @@ const defaultObjectTypeNames = {
   wifi: 'Wi-Fi'
 };
 
-// These will be populated from DB
 export let objectTypeEmojis = { ...defaultObjectTypeEmojis };
 export let objectTypeNames = { ...defaultObjectTypeNames };
 
-/**
- * Update object type mappings from DB data
- * Call this when object types are loaded from the backend
- */
 export const updateObjectTypesFromDB = (dbObjectTypes) => {
   if (!dbObjectTypes || !Array.isArray(dbObjectTypes)) return;
   

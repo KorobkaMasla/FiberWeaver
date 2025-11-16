@@ -5,8 +5,8 @@ from datetime import datetime
 
 class CableCreate(BaseModel):
     name: str
-    cable_type: Optional[str] = "optical"  # String (optical/copper) for backwards compatibility
-    cable_type_id: Optional[int] = None  # Or direct ID
+    cable_type: Optional[str] = "optical"  
+    cable_type_id: Optional[int] = None  
     fiber_count: Optional[int] = None
     from_object_id: int
     to_object_id: int
@@ -18,8 +18,8 @@ class CableResponse(BaseModel):
     id: int = Field(validation_alias='cable_id')
     name: str
     cable_type_id: int
-    cable_type_name: Optional[str] = None  # Name from DB (ОКГ-1, ОКГ-2, etc.)
-    cable_type_color: Optional[str] = None  # Color from DB (HEX)
+    cable_type_name: Optional[str] = None  
+    cable_type_color: Optional[str] = None  
     fiber_count: Optional[int] = None
     from_object_id: int
     to_object_id: int

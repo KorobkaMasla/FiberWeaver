@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Test cable routes with cable type resolution"""
 
 from app.database.database import SessionLocal

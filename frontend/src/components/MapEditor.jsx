@@ -12,7 +12,6 @@ import MapToolsBar from './MapToolsBar';
 import MapSearch from './MapSearch';
 import DrawingMode from './DrawingMode';
 
-// Исправление обычных маркеров Leaflet (подгрузка иконок из CDN)
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
@@ -20,7 +19,6 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
 });
 
-// Доступные типы объектов для форм
 const OBJECT_TYPES = [
   'Узел',
   'Муфта',
@@ -33,13 +31,11 @@ const OBJECT_TYPES = [
   'Wi-Fi'
 ];
 
-// Доступные типы кабелей для форм
 const CABLE_TYPES = [
   'optical',
   'copper'
 ];
 
-// Компонент для обработки событий карты
 function MapEvents({ measureMode, selectMode, addingPoint, pickingCoordinates, drawCableMode, pickingRegionCoordinate, onMapClick, onSelectMode, onMapMouseMove, onRegionCoordinatePicked }) {
   const [isDrawing, setIsDrawing] = useState(false);
   const [startPoint, setStartPoint] = useState(null);
@@ -51,7 +47,7 @@ function MapEvents({ measureMode, selectMode, addingPoint, pickingCoordinates, d
       }
       
       if (addingPoint || pickingCoordinates || drawCableMode) {
-        // Отключаем перетаскивание карты при добавлении точки, выборе координат или рисовании кабеля
+        // Отключаем перетаскивание карты при добавлении точки выборе координат или рисовании кабеля
         map.dragging.disable();
         return;
       }
@@ -108,7 +104,7 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
   const [highlightedDependentObjects, setHighlightedDependentObjects] = useState([]);
     const [objectForm, setObjectForm] = useState({
       name: '',
-      object_type_id: 1,  // Will be updated when objectTypes loads
+      object_type_id: 1,  
       latitude: 55.7558,
       longitude: 37.6173,
       address: ''
@@ -128,29 +124,24 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
   const [editingObjectId, setEditingObjectId] = useState(null);
   const [editingCableId, setEditingCableId] = useState(null);
   const [toast, setToast] = useState(null);
-  const [tileLayer, setTileLayer] = useState('osm'); // osm, satellite, terrain
+  const [tileLayer, setTileLayer] = useState('osm'); 
   const [measureMode, setMeasureMode] = useState(false);
   const [measurePoints, setMeasurePoints] = useState([]);
   const [selectMode, setSelectMode] = useState(false);
   const [selectionBounds, setSelectionBounds] = useState(null);
   const [toolsNotification, setToolsNotification] = useState(null);
   const [toolsNotificationKey, setToolsNotificationKey] = useState(0);
-  // Фильтры видимости
   const [visibleObjectTypes, setVisibleObjectTypes] = useState(new Set(Object.keys(objectTypeEmojis)));
-  const [visibleCableTypes, setVisibleCableTypes] = useState(new Set()); // будет заполнена после загрузки cableTypes
-  // Типы объектов из БД
+  const [visibleCableTypes, setVisibleCableTypes] = useState(new Set()); 
   const [objectTypeEmojiMap, setObjectTypeEmojiMap] = useState(objectTypeEmojis);
   const [objectTypeNameMap, setObjectTypeNameMap] = useState(objectTypeNames);
-  // Новый sidebar search/filter & address loading states
   const [objectsSearchTerm, setObjectsSearchTerm] = useState('');
   const [cablesSearchTerm, setCablesSearchTerm] = useState('');
   const [objectsQuickFilters, setObjectsQuickFilters] = useState(new Set());
-  // Отфильтрованные объекты и кабели на основе выбранных регионов
   const [filteredObjects, setFilteredObjects] = useState([]);
   const [filteredCables, setFilteredCables] = useState([]);
   const [cablesQuickFilters, setCablesQuickFilters] = useState(new Set());
   const [addressLoading, setAddressLoading] = useState(false);
-  // Поиск на карте
   const [searchActive, setSearchActive] = useState(false);
   const [mapRef, setMapRef] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1025);
@@ -162,7 +153,7 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
   const [cableStartObject, setCableStartObject] = useState(null);
   const [drawingCableEndPoint, setDrawingCableEndPoint] = useState(null);
   const [cableTypes, setCableTypes] = useState([]);
-  const [objectTypes, setObjectTypes] = useState([]); // Loaded from DB
+  const [objectTypes, setObjectTypes] = useState([]); 
   const [confirmDialog, setConfirmDialog] = useState({
     isOpen: false,
     title: '',
@@ -171,28 +162,23 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
     onCancel: null
   });
   const [drawingMode, setDrawingMode] = useState(false);
-  // Сохраняем нарисованные фигуры при переключении режима рисования
   const [drawnShapes, setDrawnShapes] = useState([]);
   
-  // Вспомогательная функция для показа уведомления инструментов с обновлением ключа
   const showToolsNotification = (message) => {
     setToolsNotification(message);
     setToolsNotificationKey(prev => prev + 1);
   };
 
-  // Фильтрация объектов и кабелей при изменении выбранных регионов
   useEffect(() => {
     const filterByRegions = async () => {
       if (selectedRegions && selectedRegions.length > 0) {
         const regionObjectIds = new Set();
         
-        // Запрос объектов для каждого выбранного региона
         for (const region of selectedRegions) {
           try {
             const response = await fetch(`http://localhost:8000/api/regions/${region.region_id}`);
             if (response.ok) {
               const regionData = await response.json();
-              // Добавляем все объекты региона в набор ID
               if (regionData.network_objects && Array.isArray(regionData.network_objects)) {
                 regionData.network_objects.forEach(obj => {
                   regionObjectIds.add(obj.network_object_id || obj.id);
@@ -206,13 +192,11 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
         
         console.log(`Region object IDs: ${Array.from(regionObjectIds).join(', ')}`);
         
-        // Фильтруем объекты - показываем только те, что в выбранных регионах
         if (regionObjectIds.size > 0) {
           const filtered = objects.filter(obj => regionObjectIds.has(obj.network_object_id || obj.id));
           console.log(`Filtered objects: ${filtered.length} out of ${objects.length}`);
           setFilteredObjects(filtered);
 
-          // Фильтруем кабели - показываем только те, у которых оба конца в выбранных регионах
           const filtered_cables = cables.filter(cable => 
             regionObjectIds.has(cable.from_object_id) && regionObjectIds.has(cable.to_object_id)
           );
@@ -238,10 +222,9 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
     fetchCableTypes();
     fetchObjectTypes();
 
-    // Слушаем сигнал обновления данных от операций импорта/экспорта
     const handleRefresh = () => {
       fetchCables();
-      onObjectsChange(); // Перезагружаем объекты также
+      onObjectsChange(); 
     };
 
     window.addEventListener('storage', (e) => {
@@ -267,7 +250,6 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
         color: t.color || '#666666'
       }));
       setCableTypes(normalized);
-      // Инициализируем видимые типы кабелей на основе загруженных данных
       setVisibleCableTypes(new Set(normalized.map(t => t.name)));
     } catch (err) {
       console.error('Error fetching cable types:', err);
@@ -282,7 +264,6 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
         { cable_type_id: 8, name: 'ОКГ-96', fiber_count: 96, color: '#008000' }
       ];
       setCableTypes(fallback);
-      // Инициализируем видимые типы кабелей на основе fallback данных
       setVisibleCableTypes(new Set(fallback.map(t => t.name)));
     }
   };
@@ -295,12 +276,10 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
       setObjectTypes(data);
     } catch (err) {
       console.error('Error fetching object types:', err);
-      // Fallback to empty array - will use defaults from mapEditorUtils
       setObjectTypes([]);
     }
   };
 
-  // Update object type mappings when loaded from DB
   useEffect(() => {
     if (objectTypes.length > 0) {
       const newEmojiMap = {};
@@ -315,21 +294,17 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
     }
   }, [objectTypes]);
 
-  // Helper function to get emoji for an object type
-  // Uses state-based mapping which updates reactively
   const getObjectTypeEmoji = (objectType) => {
     return objectTypeEmojiMap[objectType] || '';
   };
 
-  // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e) => {
-      // Don't trigger shortcuts if typing in input/textarea
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
         return;
       }
 
-      // M key: Toggle measurement mode (using e.code for language independence)
+      // Клавиша M: переключение режима измерения 
       if (e.code === 'KeyM') {
         e.preventDefault();
         setMeasureMode(prev => {
@@ -342,13 +317,13 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
           return newMode;
         });
       }
-      // C key: Clear measurements/selections
+      // Клавиша C: очистка измерений/выборов.
       if (e.code === 'KeyC') {
         e.preventDefault();
         setMeasurePoints([]);
         setSelectionBounds(null);
       }
-      // P key: Toggle point adding mode
+      // Клавиша P: переключить режим добавления точек.
       if (e.code === 'KeyP') {
         e.preventDefault();
         setAddingPoint(prev => {
@@ -362,12 +337,12 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
           return newMode;
         });
       }
-      // K key: Toggle cable drawing mode
+      // Клавиша K: переключить режим рисования кабеля.
       if (e.code === 'KeyK') {
         e.preventDefault();
         handleDrawCableModeToggle();
       }
-      // Escape key: Cancel current mode
+      // Клавиша Esc: отменить текущий режим.
       if (e.code === 'Escape') {
         e.preventDefault();
         if (drawCableMode) {
@@ -390,12 +365,12 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Handle cable drawing - clear end point on mouseup if not over marker
+  // Очистка конечной точки при наведении курсора мыши если она не находится над маркером.
   useEffect(() => {
     if (!drawCableMode) return;
 
     const handleGlobalMouseDown = (e) => {
-      // Right click - cancel current cable drawing (reset start point)
+      // Щелчок правой кнопкой мыши — отменить текущий чертеж кабеля (сбросить начальную точку).
       if (e.button === 2) {
         e.preventDefault();
         if (cableStartObjectRef.current) {
@@ -409,12 +384,9 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
     };
 
     const handleGlobalMouseUp = (e) => {
-      // Check if mouse is over a marker
       if (cableStartObjectRef.current && e.target && e.target.closest('.leaflet-marker-icon')) {
-        // Let the marker's mousedown handler deal with it
         return;
       }
-      // If mouseup is not on a marker, clear the end point
       if (cableStartObjectRef.current) {
         setDrawingCableEndPoint(null);
       }
@@ -436,17 +408,15 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
     };
   }, [drawCableMode]);
 
-  // Handle window resize for mobile detection
+  // Обработка изменения размера окна для обнаружения мобильных устройств.
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
       const isMobileNow = width < 1025;
       setIsMobile(isMobileNow);
-      // Auto-close sidebar when resizing to mobile
       if (isMobileNow) {
         setSidebarVisible(false);
       } else {
-        // Auto-open sidebar when resizing to desktop
         setSidebarVisible(true);
       }
     };
@@ -459,14 +429,12 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
     try {
       const response = await authService.authenticatedFetch('http://localhost:8000/api/cables/');
       const data = await response.json();
-      // Create new array reference to ensure React detects the change
       setCables([...data]);
     } catch (error) {
       console.error('Error fetching cables:', error);
     }
   };
 
-  // Measurement tool functions
   const handleMeasureClick = () => {
     if (measureMode) {
       setMeasureMode(false);
@@ -478,7 +446,6 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
   };
 
   const handleMapClick = (e) => {
-    // Handle adding new point
     if (addingPoint) {
       const lat = parseFloat(e.latlng.lat.toFixed(6));
       const lng = parseFloat(e.latlng.lng.toFixed(6));
@@ -505,7 +472,6 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
       return;
     }
 
-    // Handle coordinate picking for existing object
     if (pickingCoordinates) {
       const lat = parseFloat(e.latlng.lat.toFixed(6));
       const lng = parseFloat(e.latlng.lng.toFixed(6));
@@ -537,7 +503,7 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
   };
 
   const calculateDistance = (point1, point2) => {
-    const R = 6371; // Earth radius in km
+    const R = 6371; // Радиус Земли в км
     const lat1 = (point1[0] * Math.PI) / 180;
     const lat2 = (point2[0] * Math.PI) / 180;
     const dLat = ((point2[0] - point1[0]) * Math.PI) / 180;
@@ -598,7 +564,6 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
     });
   };
 
-  // Visibility toggle handlers
   const toggleObjectTypeVisibility = (type) => {
     setVisibleObjectTypes(prev => {
       const next = new Set(prev);
@@ -619,7 +584,6 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
     if (mapRef) {
       mapRef.setView([parseFloat(lat), parseFloat(lon)], 15);
     }
-    // Optionally pre-fill object form with selected location
     setObjectForm(prev => ({
       ...prev,
       latitude: parseFloat(lat),
@@ -653,7 +617,6 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
     if (name === 'from_object_id' || name === 'to_object_id') {
       parsedValue = value ? parseInt(value, 10) : '';
     } else if (name === 'fiber_count') {
-      // Преобразуем в целое число, избегаем NaN и пустых строк
       if (value && value.trim()) {
         const num = parseInt(value, 10);
         parsedValue = isNaN(num) ? '' : num;
@@ -669,12 +632,10 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
       [name]: parsedValue
     };
     
-    // Очищаем fiber_count при смене на медный кабель
     if (name === 'cable_type' && value === 'copper') {
       updatedForm.fiber_count = '';
     }
     
-    // Auto-calculate distance if both objects are selected
     if ((name === 'from_object_id' || name === 'to_object_id') && updatedForm.from_object_id && updatedForm.to_object_id) {
       const fromObj = objects.find(o => o.id === updatedForm.from_object_id);
       const toObj = objects.find(o => o.id === updatedForm.to_object_id);
@@ -737,7 +698,6 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
     
     setCableLoading(true);
     try {
-      // Конвертируем fiber_count в число, если это оптический кабель
       let fiberCount = null;
       if (cableForm.cable_type === 'optical' && cableForm.fiber_count) {
         const num = parseInt(cableForm.fiber_count, 10);
@@ -758,7 +718,6 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
       });
       if (response.ok) {
         setToast({ message: 'Кабель создан', type: 'success' });
-        // Сброс формы
         setCableForm({
           name: '',
           cable_type: 'optical',
@@ -777,12 +736,10 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
     }
   };
 
-  // Функция для объединения кабелей через drag-n-drop
   const handleMergeCables = (cableId, targetObjectId) => {
     const cable = cables.find(c => c.id === cableId);
     if (!cable) return;
 
-    // Если перетащили конец кабеля на другой объект, перенаправляем кабель
     setConfirmDialog({
       isOpen: true,
       title: `Присоединить кабель "${cable.name}" к объекту?`,
@@ -814,7 +771,6 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
     });
   };
 
-  // Функция для начала рисования кабеля между объектами
   const handleStartDrawCable = (objectId) => {
     if (!drawCableMode) return;
     
@@ -850,7 +806,7 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
       setDrawCableMode(true);
       setMeasureMode(false);
       setSelectMode(false);
-      setDrawingMode(false); // отключение режима рисования при начале рисования кабеля
+      setDrawingMode(false); 
       setMeasurePoints([]);
       setSelectionBounds(null);
       showToolsNotification('🔗 ЛКМ: метка 1 → метка 2 | ПКМ: отмена');
@@ -861,7 +817,6 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
     setDrawingMode(prev => {
       const next = !prev;
       if (next) {
-        // отключение других режимов
         setMeasureMode(false);
         setSelectMode(false);
         setDrawCableMode(false);
@@ -871,7 +826,6 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
         showToolsNotification('🎨 Режим рисования включен');
       } else {
 
-        // Явно включаем drag карты после выхода из режима рисования
         if (mapRef) {
           try { mapRef.dragging.enable(); } catch(e) {}
         }
@@ -903,13 +857,11 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
       message,
       onConfirm: async () => {
         try {
-          // Delete all connected cables
           for (const cable of relatedCables) {
             await authService.authenticatedFetch(`http://localhost:8000/api/cables/${cable.id}`, {
               method: 'DELETE'
             });
           }
-          // Delete object
           await authService.authenticatedFetch(`http://localhost:8000/api/network-objects/${objectId}`, {
             method: 'DELETE'
           });
@@ -996,7 +948,6 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
     setAddingPoint(false);
     setActiveTab('cables');
     
-    // Determine cable_type based on fiber_count
     let cable_type = 'copper';
     if (cable.fiber_count && cable.fiber_count > 0) {
       cable_type = 'optical';
@@ -1043,7 +994,6 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
     e.preventDefault();
     setCableLoading(true);
     try {
-      // Конвертируем fiber_count в число, если это оптический кабель
       let fiberCount = null;
       if (cableForm.cable_type === 'optical' && cableForm.fiber_count) {
         const num = parseInt(cableForm.fiber_count, 10);
@@ -1064,7 +1014,6 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
       });
       setToast({ message: 'Кабель обновлён', type: 'success' });
       setEditingCableId(null);
-      // Сброс формы
       setCableForm({
         name: '',
         cable_type: 'optical',
@@ -1073,7 +1022,6 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
         fiber_count: '',
         distance_km: ''
       });
-      // Полная перезагрузка кабелей
       await fetchCables();
     } catch (error) {
       console.error('Error updating cable:', error);
@@ -1083,12 +1031,10 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
     }
   };
 
-  // Получение всех зависимых объектов для подсветки
   const getDependentObjects = (cable) => {
     const allDependentIds = new Set();
     const visited = new Set();
     
-    // BFS для поиска всех связанных объектов
     const queue = [cable.from_object_id, cable.to_object_id];
     
     while (queue.length > 0) {
@@ -1098,7 +1044,6 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
       visited.add(currentObjectId);
       allDependentIds.add(currentObjectId);
       
-      // Находим все кабели, подключенные к этому объекту
       cables.forEach(c => {
         let otherEnd = null;
         
@@ -1108,7 +1053,6 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
           otherEnd = c.from_object_id;
         }
         
-        // Если нашли другой конец и он не посещён, добавляем в очередь
         if (otherEnd !== null && !visited.has(otherEnd)) {
           queue.push(otherEnd);
         }
@@ -1160,7 +1104,6 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
           [toObj.latitude, toObj.longitude]
         ).toFixed(3));
         
-        // Обновляем только если расстояние изменилось
         if (cableForm.distance_km !== distance) {
           setCableForm(prev => ({
             ...prev,
@@ -1203,9 +1146,8 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
           />
           
           
-          {/* Рисуем кабели в виде линий */}
+          {/* Кабели в виде линий */}
           {filteredCables.filter(cable => {
-            // фильтр видимости по типам кабелей - используем cable_type_name напрямую
             if (!visibleCableTypes.has(cable.cable_type_name)) return false;
             const fromObj = filteredObjects.find(o => o.id === cable.from_object_id);
             const toObj = filteredObjects.find(o => o.id === cable.to_object_id);
@@ -1265,7 +1207,7 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
             );
           })}
 
-          {/* Рисуем временную линию кабеля во время рисования */}
+          {/* Временная линия кабеля во время рисования */}
           {drawCableMode && cableStartObject && drawingCableEndPoint && (
             (() => {
               const startObj = filteredObjects.find(o => o.id === cableStartObject);
@@ -1291,13 +1233,12 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
             const obj = objects.find(o => o.id === objId);
             if (!obj) return null;
             
-            // Получаем текущий уровень зума карты
             const currentZoom = mapRef?.getZoom() || 13;
             
             // Адаптивный размер в зависимости от уровня масштабирования с динамическим коэффициентом
             // Базовый радиус становится больше при меньшем зуме, меньше при большем зуме
-            const baseRadius = Math.pow(2, 16 - currentZoom) * 50; // Динамический базовый расчет
-            const radius = Math.max(50, Math.min(baseRadius, 500)); // Ограничение между 50-500
+            const baseRadius = Math.pow(2, 16 - currentZoom) * 50; 
+            const radius = Math.max(50, Math.min(baseRadius, 500)); 
             
             // Вес линии масштабируется обратно пропорционально зуму
             const weight = Math.max(2, 5 - Math.floor(currentZoom / 5));
@@ -1323,14 +1264,13 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
             );
           })}
 
-          {/* Рисуем сетевые объекты в виде маркеров */}
+          {/* Сетевые объекты в виде маркеров */}
           {filteredObjects.filter(obj => obj && obj.id && visibleObjectTypes.has(obj.object_type)).map(obj => (
             <Marker 
               key={obj.id} 
               position={[obj.latitude, obj.longitude]}
               icon={createMarkerIcon(getObjectTypeEmoji(obj.object_type))}
               ref={(ref) => {
-                // Сохраняем ref маркера для последующих манипуляций
                 if (ref && ref.leafletElement) {
                   markerRefsMap.current[obj.id] = ref.leafletElement;
                 } else if (ref) {
@@ -1366,7 +1306,6 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
                     setCableStartObject(null);
                     setDrawingCableEndPoint(null);
                   } else {
-                    // Clicking same marker again - reset
                     cableStartObjectRef.current = null;
                     setCableStartObject(null);
                     setDrawingCableEndPoint(null);
@@ -1445,14 +1384,13 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
             </Marker>
           ))}
 
-          {/* Визуализация точек измерения */}
+          {/* Точки измерения */}
           {measurePoints.map((point, idx) => {
             let segmentDistance = null;
             if (idx > 0) {
               segmentDistance = calculateDistance(measurePoints[idx - 1], point);
             }
             
-            // Вычисляем накопленное расстояние
             let cumulativeDistance = 0;
             for (let i = 1; i <= idx; i++) {
               cumulativeDistance += calculateDistance(measurePoints[i - 1], measurePoints[i]);
@@ -1485,7 +1423,7 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
             );
           })}
           
-          {/* Визуализация линии измерения */}
+          {/* Линия измерения */}
           {measurePoints.length > 1 && (
             <Polyline 
               positions={measurePoints} 

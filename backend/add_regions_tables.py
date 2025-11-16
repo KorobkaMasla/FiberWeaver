@@ -7,7 +7,6 @@ import sqlite3
 import os
 from pathlib import Path
 
-# Path to database file
 DB_PATH = Path(__file__).parent / "test.db"
 
 
@@ -21,7 +20,6 @@ def migrate_db():
     cursor = conn.cursor()
 
     try:
-        # Create regions table
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS regions (
                 region_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -39,7 +37,6 @@ def migrate_db():
         """)
         print("✓ Created regions table")
 
-        # Create region_objects junction table
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS region_objects (
                 region_id INTEGER NOT NULL,
@@ -51,7 +48,6 @@ def migrate_db():
         """)
         print("✓ Created region_objects table")
 
-        # Create region_cables junction table
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS region_cables (
                 region_id INTEGER NOT NULL,
@@ -63,7 +59,6 @@ def migrate_db():
         """)
         print("✓ Created region_cables table")
 
-        # Create indexes
         cursor.execute("CREATE INDEX IF NOT EXISTS ix_regions_id ON regions (region_id)")
         cursor.execute("CREATE INDEX IF NOT EXISTS ix_regions_name ON regions (name)")
         cursor.execute("CREATE INDEX IF NOT EXISTS ix_regions_nominatim_id ON regions (nominatim_id)")

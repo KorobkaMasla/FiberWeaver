@@ -1,11 +1,9 @@
-#!/usr/bin/env python3
 """Test cable type conversion and API"""
 
 from app.schemas.cable import CableCreate
 from app.database.database import SessionLocal
 from app.models.cable_type import CableType
 
-# Test Pydantic validation
 print("Testing Pydantic validation...")
 test_data = {
     'name': 'Test Cable',
@@ -20,7 +18,6 @@ print(f"  Input: cable_type = '{test_data['cable_type']}'")
 print(f"  Output: cable_type_id = {cable.cable_type_id}")
 print(f"  ✓ Validator works!\n")
 
-# Test DB lookup
 print("Testing cable type lookup in DB...")
 db = SessionLocal()
 for test_name in ['ОКГ-1', 'ОКГ-12', 'ОКГ-96']:

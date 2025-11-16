@@ -168,11 +168,11 @@ const RegionFilter = forwardRef(function RegionFilter({ selectedRegions = [], on
       const objects = await loadObjectsByCity(displayName);
       console.log(`Found ${objects.length} objects in ${displayName}`);
 
-      // Загружаем кабели, где обе точки из этого города
+      // Загружаем кабели где обе точки из этого города
       const cables = await loadCablesByCity(objects);
       console.log(`Found ${cables.length} cables in ${displayName}`);
 
-      // Если регион создан успешно, добавляем найденные объекты в регион
+      // Если регион создан успешно добавляем найденные объекты в регион
       if (region && region.region_id && objects.length > 0) {
         try {
           for (const obj of objects) {
@@ -187,7 +187,7 @@ const RegionFilter = forwardRef(function RegionFilter({ selectedRegions = [], on
         }
       }
 
-      // Если регион создан успешно, добавляем найденные кабели в регион
+      // Если регион создан успешно добавляем найденные кабели в регион
       if (region && region.region_id && cables.length > 0) {
         try {
           for (const cable of cables) {
@@ -258,7 +258,7 @@ const RegionFilter = forwardRef(function RegionFilter({ selectedRegions = [], on
       osm_id = suggestion.osm_id;
     }
     
-    // Проверяем, выбран ли уже этот регион
+    // Проверяем выбран ли уже этот регион
     const alreadySelected = selectedRegions.some(r => r.name === displayName);
     
     if (alreadySelected) {
@@ -339,7 +339,7 @@ const RegionFilter = forwardRef(function RegionFilter({ selectedRegions = [], on
     }
   };
 
-  // Expose handleMapCoordinate function to parent component
+  // Даем функцию handleMapCoordinate родительскому компоненту
   useImperativeHandle(ref, () => ({
     handleMapCoordinate: handleMapCoordinate
   }), [selectedRegions, existingRegions]);
@@ -414,7 +414,7 @@ const RegionFilter = forwardRef(function RegionFilter({ selectedRegions = [], on
                     const aSelected = selectedRegions.some(r => r.name === aDisplay);
                     const bSelected = selectedRegions.some(r => r.name === bDisplay);
                     
-                    // Сначала выбранные, потом невыбранные
+                    // Сначала выбранные потом невыбранные
                     if (aSelected !== bSelected) {
                       return aSelected ? -1 : 1;
                     }

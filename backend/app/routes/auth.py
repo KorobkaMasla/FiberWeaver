@@ -20,7 +20,6 @@ async def register(user_data: UserCreate, db: Session = Depends(get_db)):
     print(f"1. Received data: login={user_data.login}, email={user_data.email}")
     
     try:
-        # Проверяем, существует ли уже пользователь с таким login
         print(f"2. Checking if login exists...")
         existing_user = db.query(User).filter(User.login == user_data.login).first()
         if existing_user:
@@ -30,7 +29,6 @@ async def register(user_data: UserCreate, db: Session = Depends(get_db)):
                 detail="Login already registered"
             )
         
-        # Проверяем, существует ли уже пользователь с таким email
         print(f"3b. Checking if email exists...")
         existing_email = db.query(User).filter(User.email == user_data.email).first()
         if existing_email:
@@ -40,12 +38,10 @@ async def register(user_data: UserCreate, db: Session = Depends(get_db)):
                 detail="Email already registered"
             )
         
-        # Хешируем пароль
         print(f"4. Hashing password...")
         hashed_password = hash_password(user_data.password)
         print(f"5. Password hashed successfully")
         
-        # Создаем нового пользователя
         print(f"6. Creating user in database...")
         db_user = User(
             login=user_data.login,
@@ -57,12 +53,10 @@ async def register(user_data: UserCreate, db: Session = Depends(get_db)):
         db.refresh(db_user)
         print(f"7. User created: user_id={db_user.user_id}")
         
-        # Загружаем роли пользователя
         print(f"8. Loading roles...")
         db.refresh(db_user, ["roles"])
         print(f"9. Roles loaded")
         
-        # Создаем токены с user_id в качестве subject (преобразуем в строку)
         print(f"10. Creating tokens...")
         access_token = create_access_token(data={"sub": str(db_user.user_id)})
         refresh_token = create_refresh_token(data={"sub": str(db_user.user_id)})
@@ -98,7 +92,6 @@ async def login(login_data: LoginRequest, db: Session = Depends(get_db)):
     print(f"1. Login attempt: {login_data.login}")
     
     try:
-        # Ищем пользователя по login
         print(f"2. Querying user...")
         user = db.query(User).filter(User.login == login_data.login).first()
         
@@ -111,12 +104,10 @@ async def login(login_data: LoginRequest, db: Session = Depends(get_db)):
         
         print(f"4. User found: user_id={user.user_id}")
         
-        # Загружаем роли пользователя
         print(f"5. Loading roles...")
         db.refresh(user, ["roles"])
         print(f"6. Roles loaded")
         
-        # Создаем токены с user_id в качестве subject (преобразуем в строку)
         print(f"7. Creating tokens...")
         access_token = create_access_token(data={"sub": str(user.user_id)})
         refresh_token = create_refresh_token(data={"sub": str(user.user_id)})
@@ -181,10 +172,8 @@ async def refresh_token(refresh_data: RefreshTokenRequest, db: Session = Depends
     
     print(f"2. User found: {user.login}")
     
-    # Загружаем роли пользователя
     db.refresh(user, ["roles"])
     
-    # Создаем новые токены
     access_token = create_access_token(data={"sub": str(user.user_id)})
     new_refresh_token = create_refresh_token(data={"sub": str(user.user_id)})
     

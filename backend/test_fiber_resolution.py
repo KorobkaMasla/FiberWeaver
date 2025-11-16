@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Test cable type resolution with fiber_count"""
 
 from app.database.database import SessionLocal
