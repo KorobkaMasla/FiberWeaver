@@ -4,7 +4,7 @@ from sqlalchemy.sql import func
 from ..database.database import Base
 
 
-# Association table for many-to-many relationship between Region and NetworkObject
+# Таблица ассоциаций для отношений «многие ко многим» между регионом и NetworkObject
 region_objects = Table(
     'region_objects',
     Base.metadata,
@@ -12,7 +12,7 @@ region_objects = Table(
     Column('network_object_id', Integer, ForeignKey('network_objects.network_object_id'), primary_key=True)
 )
 
-# Association table for many-to-many relationship between Region and Cable
+# Таблица ассоциаций для отношений «многие ко многим» между регионом и кабелем
 region_cables = Table(
     'region_cables',
     Base.metadata,
@@ -28,15 +28,15 @@ class Region(Base):
     name = Column(String, index=True, nullable=False, unique=True)
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
-    display_name = Column(String, nullable=True)  # Display name from Nominatim (e.g., "Москва, Россия")
+    display_name = Column(String, nullable=True)  # Отображаемое имя от Nominatim 
     country = Column(String, nullable=True)
     state = Column(String, nullable=True)
-    nominatim_id = Column(Integer, nullable=True, unique=True)  # OSM ID from Nominatim
+    nominatim_id = Column(Integer, nullable=True, unique=True)  # OSM ID от имени
     description = Column(Text, nullable=True)
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=True)
 
-    # Relationships
+    # Отношения
     network_objects = relationship(
         "NetworkObject",
         secondary=region_objects,
@@ -51,7 +51,7 @@ class Region(Base):
     )
 
 
-# Event to update updated_at when relationships change
+# Событие для обновления update_at при изменении отношений
 @event.listens_for(Region.network_objects, "append")
 @event.listens_for(Region.network_objects, "remove")
 @event.listens_for(Region.cables, "append")
