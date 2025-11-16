@@ -1,0 +1,49 @@
+/* Уведомление инструментов - по центру внизу */
+
+.tools-notification {
+  position: absolute;
+  bottom: 90px;  /* Above tools panel */
+  left: 50%;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--bg-hover);
+  border-radius: 8px;
+  padding: 12px 24px;
+  z-index: 25;
+  max-width: 500px;
+  min-width: 300px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+  will-change: transform, opacity;
+  opacity: 0;
+  transform: translateX(-50%) translateY(20px);  /* Центр по горизонтали, ниже по вертикали */
+}
+
+.tools-notification-open {
+  animation: slideUp 0.2s ease-out 0s forwards;
+  transform: translateX(-50%) translateY(0) !important;
+  opacity: 1 !important;
+}
+
+.tools-notification-closing {
+  animation: slideDownClose 0.2s ease-in forwards;
+}
+
+.tools-notification-text {
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.4;
+  margin-bottom: 4px;
+}
+
+.tools-notification-timer {
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+  border-radius: 1px;
+  transition: width 0.05s linear;
+}
+
+.tools-notification-closing {
+  animation: slideDownClose 0.2s ease-in forwards;
+}

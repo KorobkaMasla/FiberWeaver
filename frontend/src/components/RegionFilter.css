@@ -1,0 +1,303 @@
+.region-filter-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.region-filter-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: transparent;
+  border: 1px solid var(--text-tertiary);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.region-filter-toggle:hover {
+  background: var(--bg-hover);
+  border-color: var(--text-secondary);
+  color: var(--text-primary);
+}
+
+.region-icon {
+  font-size: 14px;
+}
+
+.region-label {
+  display: inline-block;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.region-arrow {
+  display: inline-block;
+  transition: transform var(--transition-fast);
+  font-size: 10px;
+  opacity: 0.6;
+}
+
+.region-arrow.open {
+  transform: rotate(180deg);
+}
+
+.region-filter-menu {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 8px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  z-index: 1000;
+  min-width: 280px;
+  max-width: 380px;
+  max-height: 500px;
+  display: flex;
+  flex-direction: column;
+}
+
+.region-search-container {
+  padding: 12px;
+  border-bottom: 1px solid var(--bg-tertiary);
+  flex-shrink: 0;
+}
+
+.region-list-container {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 150px;
+}
+
+.region-search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.region-search-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--bg-tertiary);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-family: inherit;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.region-search-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.region-search-input:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.1);
+}
+
+.search-loading {
+  position: absolute;
+  right: 12px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.region-suggestions {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.region-suggestions.full-list {
+  position: static;
+  top: auto;
+  left: auto;
+  right: auto;
+  background: transparent;
+  border: none;
+  border-top: none;
+  max-height: none;
+  margin-top: 0;
+}
+
+.region-suggestion-item {
+  padding: 10px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--bg-tertiary);
+  font-size: 13px;
+  color: var(--text-primary);
+  transition: background-color var(--transition-fast), transform var(--transition-base), opacity var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.region-item-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.region-suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.region-suggestion-item:hover {
+  background-color: var(--bg-hover);
+}
+
+.region-suggestion-item.existing {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.region-suggestion-item.selected {
+  background-color: rgba(129, 129, 129, 0.15);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0.8;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.existing-badge {
+  font-size: 12px;
+  color: var(--color-success);
+  font-weight: 600;
+}
+
+.suggestion-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-primary);
+}
+
+.pick-from-map-btn {
+  width: 100%;
+  padding: 7px;
+  background: var(--accent-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+  font-family: inherit;
+  margin-top: 4px;
+  box-shadow: 0 4px 12px rgba(130, 130, 130, 0.25);
+}
+
+.pick-from-map-btn:hover:not(:disabled) {
+  background-color: #2d2d2d;
+  box-shadow: 0 6px 20px rgba(130, 130, 130, 0.35);
+  transform: translateY(-2px);
+}
+
+.pick-from-map-btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(130, 130, 130, 0.2);
+}
+
+.pick-from-map-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.region-empty-text {
+  padding: 12px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  text-align: center;
+  margin: 0;
+}
+
+.region-stats {
+  font-size: 11px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  padding: 2px 6px;
+  background: var(--bg-tertiary);
+  border-radius: 3px;
+  transition: all var(--transition-fast);
+}
+
+.region-stats:hover {
+  background: var(--accent-primary);
+  color: white;
+  cursor: pointer;
+}
+
+.region-delete-btn {
+  padding: 3px 6px;
+  background: var(--color-error);
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: background-color var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.region-delete-btn:hover {
+  background-color: #dc2626;
+}
+
+.region-delete-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Scrollbar styling */
+.region-suggestions::-webkit-scrollbar,
+.region-selected-list::-webkit-scrollbar {
+  width: 5px;
+}
+
+.region-suggestions::-webkit-scrollbar-track,
+.region-selected-list::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+.region-suggestions::-webkit-scrollbar-thumb,
+.region-selected-list::-webkit-scrollbar-thumb {
+  background: var(--bg-tertiary);
+  border-radius: 2px;
+}
+
+.region-suggestions::-webkit-scrollbar-thumb:hover,
+.region-selected-list::-webkit-scrollbar-thumb:hover {
+  background: var(--bg-hover);
+}

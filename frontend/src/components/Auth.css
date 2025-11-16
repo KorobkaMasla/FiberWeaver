@@ -1,0 +1,241 @@
+/* Стили аутентификации */
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+}
+
+.auth-card {
+  background: #1a1a1a;
+  padding: 40px;
+  border-radius: 12px;
+  border: 1px solid #333;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+  width: 100%;
+  max-width: 400px;
+  color: #e0e0e0;
+}
+
+.auth-card h1 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #e0e0e0;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.auth-form .form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-form label {
+  font-weight: 600;
+  color: #a0a0a0;
+  margin-bottom: 6px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.auth-form input {
+  padding: 10px 14px;
+  border: 1px solid #333;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  background-color: #252525;
+  color: #e0e0e0;
+}
+
+.auth-form input::placeholder {
+  color: #666;
+}
+
+.auth-form input:focus {
+  outline: none;
+  border-color: #4a9eff;
+  box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.2);
+  background-color: #2a2a2a;
+}
+
+.auth-form input:disabled {
+  background-color: #1f1f1f;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.error-message {
+  background-color: #7f1d1d;
+  border: 1px solid #991b1b;
+  color: #fca5a5;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.auth-form button {
+  padding: 12px 16px;
+  background: #333333;
+  color: #e0e0e0;
+  border: 1px solid #444;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 8px;
+}
+
+.auth-form button:hover:not(:disabled) {
+  background: #404040;
+  border-color: #555;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.auth-form button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.auth-link {
+  text-align: center;
+  margin-top: 20px;
+  color: #888;
+  font-size: 14px;
+}
+
+.auth-link a {
+  color: #888;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.auth-link a:hover {
+  color: #aaa;
+}
+
+.auth-switch {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 13px;
+}
+
+.auth-switch button {
+  padding: 0;
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  transition: color 0.3s ease;
+}
+
+.auth-switch button:hover {
+  color: #aaa;
+}
+
+/* Адаптивный дизайн */
+@media (max-width: 768px) {
+  .auth-container {
+    padding: 16px;
+  }
+
+  .auth-card {
+    padding: 32px 20px;
+    max-width: 100%;
+  }
+
+  .auth-card h1 {
+    font-size: 24px;
+    margin-bottom: 24px;
+  }
+
+  .auth-form {
+    gap: 14px;
+  }
+
+  .auth-form input {
+    font-size: 16px;
+    padding: 12px;
+    min-height: 44px;
+  }
+
+  .auth-form button {
+    min-height: 44px;
+    font-size: 16px;
+    padding: 12px;
+  }
+
+  .error-message {
+    font-size: 12px;
+    padding: 10px;
+  }
+
+  .auth-form .form-group {
+    gap: 8px;
+  }
+
+  .auth-form label {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-container {
+    padding: 12px;
+  }
+
+  .auth-card {
+    padding: 24px 16px;
+    border-radius: 8px;
+  }
+
+  .auth-card h1 {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+
+  .auth-form {
+    gap: 12px;
+  }
+
+  .auth-form input {
+    font-size: 16px;
+    padding: 10px;
+    min-height: 40px;
+  }
+
+  .auth-form button {
+    min-height: 40px;
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .error-message {
+    font-size: 11px;
+    padding: 8px;
+    margin-bottom: 6px;
+  }
+
+  .auth-form label {
+    font-size: 12px;
+  }
+}

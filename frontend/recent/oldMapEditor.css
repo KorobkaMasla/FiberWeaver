@@ -1,0 +1,225 @@
+/* MapEditor компонент — специфичные стили и переопределения Leaflet
+   Базовая стилизация (.map-editor, .sidebar, .map-container) — из frontend/src/styles/components.css
+*/
+
+/* Переопределения стилей Leaflet для тёмной темы */
+.leaflet-control-zoom {
+  border: 1px solid var(--bg-hover);
+  border-radius: 4px;
+  background: var(--bg-secondary) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out {
+  background-color: var(--bg-tertiary) !important;
+  color: var(--text-primary) !important;
+  border: none;
+  border-bottom: 1px solid var(--bg-hover);
+  font-size: 18px;
+  font-weight: bold;
+  transition: all var(--transition-fast);
+}
+
+.leaflet-control-zoom-in:hover,
+.leaflet-control-zoom-out:hover {
+  background-color: var(--bg-hover) !important;
+  color: var(--accent-primary) !important;
+}
+
+.leaflet-control-zoom-out {
+  border-bottom: none;
+}
+
+.leaflet-control-attribution {
+  background: rgba(20, 20, 20, 0.8) !important;
+  color: var(--text-tertiary) !important;
+  font-size: 10px;
+}
+
+.leaflet-popup-content-wrapper {
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.leaflet-popup-content {
+  color: var(--text-primary);
+  font-size: 12px;
+}
+
+.leaflet-popup-tip {
+  background-color: var(--bg-secondary);
+}
+
+
+/* Специфичные стили для объектов на панели (компонент-уникальные) */
+.object-name {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.object-coords {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-top: 4px;
+  font-family: monospace;
+}
+
+.object-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.btn-small {
+  flex: 1;
+  padding: 6px 10px;
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
+  border: 1px solid var(--bg-hover);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-small:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--accent-primary);
+}
+
+.btn-small.delete:hover {
+  background-color: rgba(239, 68, 68, 0.15);
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+/* Маркеры и геометрия на карте */
+.leaflet-marker-icon {
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5));
+}
+
+.custom-marker-icon {
+  background: transparent !important;
+  border: none !important;
+}
+
+.custom-marker-icon:hover {
+  cursor: grab !important;
+}
+
+.custom-marker-icon.dragging {
+  cursor: grabbing !important;
+}
+
+.leaflet-circle {
+  stroke: var(--accent-primary);
+  fill: rgba(74, 158, 255, 0.1);
+}
+
+/* Drag & Drop для кабелей */
+.cable-item[draggable="true"] {
+  cursor: grab;
+}
+
+.cable-item[draggable="true"]:active {
+  cursor: grabbing;
+}
+
+.custom-marker-icon[data-drag-over="true"] {
+  background-color: rgba(74, 158, 255, 0.3) !important;
+}
+
+/* Стили для режима рисования кабелей */
+.cable-drawing-temp {
+  pointer-events: none !important;
+}
+
+.custom-marker-icon.selected > div {
+  background-color: #d1d5db !important;
+  border-color: #d1d5db !important;
+  box-shadow: 0 0 12px rgba(209, 213, 219, 0.8) !important;
+}
+
+.leaflet-map.draw-cable-mode {
+  cursor: crosshair !important;
+}
+
+.custom-marker-icon.draw-cable-start {
+  filter: drop-shadow(0 0 8px rgba(52, 211, 153, 0.8));
+}
+
+.custom-marker-icon.draw-cable-highlight {
+  filter: drop-shadow(0 0 12px rgba(74, 158, 255, 0.8)) brightness(1.2);
+}
+
+/* Tool button styles */
+.tool-btn {
+  padding: 10px 14px;
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
+  border: 2px solid var(--bg-hover);
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.tool-btn:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--accent-primary);
+}
+
+.tool-btn.active {
+  background-color: var(--accent-primary);
+  color: white;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 12px rgba(74, 158, 255, 0.5);
+}
+
+.tool-btn.tool-btn-danger {
+  color: #ef4444;
+  border-color: #dc2626;
+}
+
+.tool-btn.tool-btn-danger:hover {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  border-color: #ef4444;
+}
+
+/* Адаптивность для MapEditor */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 280px;
+  }
+
+  .sidebar-header {
+    padding: 12px;
+  }
+
+  .object-item {
+    padding: 10px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar {
+    width: 250px;
+  }
+
+  .leaflet-control-zoom {
+    zoom: 0.8;
+  }
+}

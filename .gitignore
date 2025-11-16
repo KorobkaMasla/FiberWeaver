@@ -1,0 +1,108 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.venv
+venv/
+ENV/
+env/
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+test.db
+
+# Backend
+backend/test.db
+backend/.venv/
+backend/app/__pycache__/
+backend/uploads/
+backend/*.log
+
+# Frontend
+node_modules/
+frontend/dist/
+frontend/build/
+frontend/.env.local
+frontend/.env.*.local
+frontend/package-lock.json
+
+# IDE specific
+.vscode/settings.json
+.vscode/launch.json
+.idea/workspace.xml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+.tmp/
+
+# Build artifacts
+dist/
+build/
+*.tar.gz
+*.zip
+
+# IDE cache
+.cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# npm
+.npm
+npm-debug.log
+yarn-error.log
+
+# Production files (if generated)
+frontend/build/
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# OS temp files
+$RECYCLE.BIN/
