@@ -248,8 +248,8 @@ function MapCanvas(props) {
         >
           <Popup>
             <div className="popup-content">
-              <p><strong>{obj.name}</strong></p>
-              <p>{objectTypeNames[obj.object_type]}</p>
+              <p><strong>{obj.display_name || obj.name}</strong></p>
+              <p>{obj.display_name || objectTypeNames[obj.object_type]}</p>
               <small>{obj.latitude.toFixed(4)}, {obj.longitude.toFixed(4)}</small>
               <div className="popup-actions" style={{ marginTop: '8px', display: 'flex', gap: '6px' }}>
                 <button onClick={() => { handleEditObject(obj); setActiveTab('objects'); }} className="btn-icon" title="Редактировать" style={{ flex: 1, padding: '4px 6px', fontSize: '12px' }}>✏️ Редакт</button>

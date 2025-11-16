@@ -108,7 +108,7 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
   const [highlightedDependentObjects, setHighlightedDependentObjects] = useState([]);
     const [objectForm, setObjectForm] = useState({
       name: '',
-      object_type: 'node',
+      object_type_id: 1,  // Will be updated when objectTypes loads
       latitude: 55.7558,
       longitude: 37.6173,
       address: ''
@@ -483,7 +483,7 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
       const lng = parseFloat(e.latlng.lng.toFixed(6));
       setObjectForm({
         name: '',
-        object_type: 'node',
+        object_type_id: 1,
         latitude: lat,
         longitude: lng,
         address: ''
@@ -709,7 +709,7 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
         setToast({ message: 'Объект создан', type: 'success' });
         setObjectForm({
           name: '',
-          object_type: 'node',
+          object_type_id: 1,
           latitude: mapPosition[0],
           longitude: mapPosition[1],
           address: ''
@@ -916,7 +916,7 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
           setEditingObjectId(null);
           setObjectForm({
             name: '',
-            object_type: 'node',
+            object_type_id: 1,
             latitude: 55.7558,
             longitude: 37.6173
           });
@@ -982,7 +982,7 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
     setAddingPoint(false);
     setObjectForm({
       name: obj.name,
-      object_type: obj.object_type,
+      object_type_id: obj.object_type_id,
       latitude: obj.latitude,
       longitude: obj.longitude,
       address: obj.address || ''
@@ -1024,7 +1024,7 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
       setEditingObjectId(null);
       setObjectForm({
         name: '',
-        object_type: 'node',
+        object_type_id: 1,
         latitude: mapPosition[0],
         longitude: mapPosition[1],
         address: ''
@@ -1412,7 +1412,7 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
               <Popup>
                 <div className="popup-content">
                   <p><strong>{obj.name}</strong></p>
-                  <p>{obj.object_type}</p>
+                  <p>{obj.display_name}</p>
                   <small>{obj.latitude.toFixed(4)}, {obj.longitude.toFixed(4)}</small>
                   <div className="popup-actions" style={{ marginTop: '8px', display: 'flex', gap: '6px' }}>
                     <button
@@ -1564,7 +1564,7 @@ function MapEditor({ objects, onObjectsChange, sidebarVisible, setSidebarVisible
           setEditingObjectId(null);
           setObjectForm({
             name: '',
-            object_type: 'node',
+            object_type_id: 1,
             latitude: mapPosition[0],
             longitude: mapPosition[1],
             address: ''

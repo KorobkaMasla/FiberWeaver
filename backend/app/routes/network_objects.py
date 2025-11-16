@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 from datetime import datetime
 from ..database.database import get_db
 from ..models.network_object import NetworkObject
@@ -18,7 +18,7 @@ def list_network_objects_public(
     db: Session = Depends(get_db)
 ):
     """Public endpoint - no authentication required (for development/testing)"""
-    return db.query(NetworkObject).offset(skip).limit(limit).all()
+    return db.query(NetworkObject).options(selectinload(NetworkObject.object_type_obj)).offset(skip).limit(limit).all()
 
 
 @router.post("/", response_model=NetworkObjectResponse)
@@ -62,6 +62,11 @@ def create_network_object(
             db.rollback()
             # Продолжаем работу даже если произойдёт ошибка
     
+    # Reload with relationship eager-loaded
+    db_obj = db.query(NetworkObject).options(selectinload(NetworkObject.object_type_obj)).filter(
+        NetworkObject.network_object_id == db_obj.network_object_id
+    ).first()
+    
     return db_obj
 
 
@@ -71,7 +76,7 @@ def get_network_object(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    obj = db.query(NetworkObject).filter(NetworkObject.network_object_id == object_id).first()
+    obj = db.query(NetworkObject).options(selectinload(NetworkObject.object_type_obj)).filter(NetworkObject.network_object_id == object_id).first()
     if not obj:
         raise HTTPException(status_code=404, detail="Object not found")
     return obj
@@ -84,7 +89,7 @@ def update_network_object(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    obj = db.query(NetworkObject).filter(NetworkObject.network_object_id == object_id).first()
+    obj = db.query(NetworkObject).options(selectinload(NetworkObject.object_type_obj)).filter(NetworkObject.network_object_id == object_id).first()
     if not obj:
         raise HTTPException(status_code=404, detail="Object not found")
     
@@ -102,7 +107,7 @@ def delete_network_object(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    obj = db.query(NetworkObject).filter(NetworkObject.network_object_id == object_id).first()
+    obj = db.query(NetworkObject).options(selectinload(NetworkObject.object_type_obj)).filter(NetworkObject.network_object_id == object_id).first()
     if not obj:
         raise HTTPException(status_code=404, detail="Object not found")
     

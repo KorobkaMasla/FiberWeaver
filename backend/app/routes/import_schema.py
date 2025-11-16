@@ -34,11 +34,22 @@ async def import_schema(file: UploadFile = File(...), db: Session = Depends(get_
                 ).first()
                 
                 if not existing:
+                    # Get object_type_id from imported data or look up by name
+                    object_type_value = obj_data.get("object_type_id")
+                    if not object_type_value:
+                        # Try to find by object_type name
+                        from ..models.object_type import ObjectType
+                        obj_type_name = obj_data.get("object_type", "node")
+                        obj_type = db.query(ObjectType).filter(ObjectType.name == obj_type_name).first()
+                        object_type_value = obj_type.object_type_id if obj_type else 1
+                    
                     new_obj = NetworkObject(
                         name=obj_data["name"],
-                        object_type=obj_data.get("object_type", "node"),
-                        latitude=obj_data["latitude"],
-                        longitude=obj_data["longitude"]
+                        object_type_id=object_type_value,
+                        latitude=obj_data.get("latitude"),
+                        longitude=obj_data.get("longitude"),
+                        address=obj_data.get("address"),
+                        description=obj_data.get("description")
                     )
                     db.add(new_obj)
                     db.flush()
@@ -64,9 +75,12 @@ async def import_schema(file: UploadFile = File(...), db: Session = Depends(get_
                     ).first()
                     
                     if not existing:
+                        # Get cable_type_id from database - default to 1 if not found
+                        cable_type_id = cable_data.get("cable_type_id", 1)
+                        
                         new_cable = Cable(
                             name=cable_data["name"],
-                            cable_type=cable_data.get("cable_type", "optical"),
+                            cable_type_id=cable_type_id,
                             fiber_count=cable_data.get("fiber_count", 1),
                             from_object_id=from_obj_id,
                             to_object_id=to_obj_id,

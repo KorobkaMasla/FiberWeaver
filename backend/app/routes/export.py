@@ -26,10 +26,14 @@ def export_full_schema(db: Session = Depends(get_db)):
             {
                 "id": obj.network_object_id,
                 "name": obj.name,
-                "object_type": obj.object_type,
+                "object_type_id": obj.object_type_id,
+                "object_type": obj.object_type_obj.name if obj.object_type_obj else "unknown",
                 "latitude": obj.latitude,
                 "longitude": obj.longitude,
-                "created_at": obj.created_at.isoformat() if obj.created_at else None
+                "address": obj.address,
+                "description": obj.description,
+                "created_at": obj.created_at.isoformat() if obj.created_at else None,
+                "updated_at": obj.updated_at.isoformat() if obj.updated_at else None
             }
             for obj in objects
         ],
@@ -37,13 +41,14 @@ def export_full_schema(db: Session = Depends(get_db)):
             {
                 "id": cable.cable_id,
                 "name": cable.name,
-                "cable_type": cable.cable_type,
+                "cable_type_id": cable.cable_type_id,
                 "fiber_count": cable.fiber_count,
                 "from_object_id": cable.from_object_id,
                 "to_object_id": cable.to_object_id,
                 "distance_km": cable.distance_km,
                 "description": cable.description,
-                "created_at": cable.created_at.isoformat() if cable.created_at else None
+                "created_at": cable.created_at.isoformat() if cable.created_at else None,
+                "updated_at": cable.updated_at.isoformat() if cable.updated_at else None
             }
             for cable in cables
         ],

@@ -188,13 +188,13 @@ function MapEditorSidebar({
               <div className="form-group">
                 <label>Тип</label>
                 <select 
-                  name="object_type" 
-                  value={objectsForm.object_type}
+                  name="object_type_id" 
+                  value={objectsForm.object_type_id || 1}
                   onChange={onObjectsFormChange}
                 >
-                  {Object.keys(objectTypeEmojis).map(type => (
-                    <option key={type} value={type}>
-                      {objectTypeEmojis[type]} {objectTypeNames[type]}
+                  {objectTypes.map(type => (
+                    <option key={type.object_type_id} value={type.object_type_id}>
+                      {type.emoji} {type.display_name}
                     </option>
                   ))}
                 </select>
@@ -333,7 +333,7 @@ function MapEditorSidebar({
                   <div key={obj.id} className={`object-item ${isActive ? 'active' : ''}`}>
                     <span className="object-type">{objectTypeEmojis[obj.object_type]}</span>
                     <div className="object-info">
-                      <strong>{obj.name}</strong>
+                      <strong>{obj.display_name || obj.name}</strong>
                       <small>{objectTypeNames[obj.object_type]}</small>
                     </div>
                     <div className="item-actions" style={{ marginLeft: 'auto', display: 'flex', gap: '6px' }}>
